@@ -1,9 +1,22 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
-<title>안전비서 상세페이지</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style><title>안전비서 상세페이지</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<!-- Google Tag Manager -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
+</script>
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-WK87FP59"></script>
+<!-- End Google Tag Manager -->
+</head><body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WK87FP59" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+
 <style>
 /* Layout: Figma 1280 프레임 → 1120 콘텐츠 폭, 섹션 띠는 화면 끝까지. 단일 라이트 테마(브랜드 레드 + 차콜 띠) */
 :root{
@@ -921,6 +934,7 @@ section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-in
     if (isInd) { renderInd(k); document.title = `안전비서 · ${IND[k].name}`; }
     else document.title = '안전비서 상세페이지';
     window.scrollTo({top:0, behavior:'instant'});
+    try { window.dataLayer.push({ event: 'virtual_page_view', page_path: location.pathname + location.hash, page_title: document.title }); } catch (e) {}
   }
   addEventListener('hashchange', route);
 
@@ -1002,36 +1016,25 @@ section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-in
     if ($('#website').value) return; // 스팸 방지용 숨은 칸
     sendLead(v);
   });
-  const WEBHOOK = 'https://discord.com/api/webhooks/1565248004582015017/C5r68TqIoCb6_BQZyp_0ZYKbBRbcmGhxS9FnH5zJrBhUjgfB15Hz0ueWByNMqSfRbvjl';
+  // 상담 신청을 받는 Cloudflare Worker 주소 (배포 후 실제 주소로 바꿔주세요)
+  const LEAD_ENDPOINT = 'https://safety-aide-lead.YOUR-SUBDOMAIN.workers.dev';
   let sending = false;
   async function sendLead(v){
     if (sending) return; sending = true;
     const btn = $('#submitBtn'); btn.disabled = true; btn.textContent = '보내는 중…'; $('#sendErr').hidden = true;
     const k = location.hash.slice(1); const page = (k in IND) ? IND[k].name + ' 페이지' : '홈';
-    const clip = t => String(t).slice(0, 200);
-    const payload = {
-      username: '안전비서 상담 신청',
-      allowed_mentions: { parse: [] },
-      embeds: [{
-        title: '새 무료 도입 상담 신청',
-        color: 0xD7191F,
-        fields: [
-          { name: '회사명', value: clip(v.company), inline: true },
-          { name: '담당자명', value: clip(v.name), inline: true },
-          { name: '연락처', value: clip(v.phone), inline: true },
-          { name: '업종', value: clip(v.ind), inline: true },
-          { name: '신청한 페이지', value: page, inline: true },
-          { name: '개인정보 동의', value: '동의함', inline: true }
-        ],
-        timestamp: new Date().toISOString()
-      }]
-    };
-    const fd = new FormData(); fd.append('payload_json', JSON.stringify(payload));
     try {
-      await fetch(WEBHOOK, { method: 'POST', body: fd, mode: 'no-cors' });
+      const res = await fetch(LEAD_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ company: v.company, name: v.name, phone: v.phone, ind: v.ind, page, agree: true, website: $('#website').value })
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || !out.ok) throw new Error(out.error || ('HTTP ' + res.status));
       $('#summary').innerHTML = [['회사명',v.company],['담당자',v.name],['연락처',v.phone],['업종',v.ind]].map(([a])=>`<dt>${a}</dt><dd></dd>`).join('');
       $$('#summary dd').forEach((dd,i)=> dd.textContent = [v.company,v.name,v.phone,v.ind][i]);
       $('#formBody').hidden = true; $('#done').hidden = false;
+      try { window.dataLayer.push({ event: 'generate_lead', lead_industry: v.ind, lead_page: page }); } catch (e) {}
     } catch (err) {
       $('#sendErr').hidden = false;
     } finally {
