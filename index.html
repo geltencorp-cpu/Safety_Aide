@@ -11,6 +11,11 @@
 </script>
 <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-WK87FP59"></script>
 <!-- End Google Tag Manager -->
+<!-- Google tag (gtag.js) - 구글 애널리틱스 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-86J6WGLBRT"></script>
+<script>
+  gtag('config', 'G-86J6WGLBRT');
+</script>
 </head><body>
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WK87FP59" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -935,6 +940,9 @@ section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-in
     else document.title = '안전비서 상세페이지';
     window.scrollTo({top:0, behavior:'instant'});
     try { window.dataLayer.push({ event: 'virtual_page_view', page_path: location.pathname + location.hash, page_title: document.title }); } catch (e) {}
+    // 구글 애널리틱스: 첫 로드는 config가 자동 기록하므로, 이후 화면 전환만 page_view로 보냄
+    if (window.__routedOnce) { try { gtag('event', 'page_view', { page_title: document.title, page_location: location.href, page_path: location.pathname + location.hash }); } catch (e) {} }
+    window.__routedOnce = true;
   }
   addEventListener('hashchange', route);
 
@@ -1035,6 +1043,7 @@ section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-in
       $$('#summary dd').forEach((dd,i)=> dd.textContent = [v.company,v.name,v.phone,v.ind][i]);
       $('#formBody').hidden = true; $('#done').hidden = false;
       try { window.dataLayer.push({ event: 'generate_lead', lead_industry: v.ind, lead_page: page }); } catch (e) {}
+      try { gtag('event', 'generate_lead', { lead_industry: v.ind, lead_page: page }); } catch (e) {}
     } catch (err) {
       $('#sendErr').hidden = false;
     } finally {
