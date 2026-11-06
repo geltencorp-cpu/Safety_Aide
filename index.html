@@ -1,0 +1,1051 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
+<title>안전비서 상세페이지</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: Figma 1280 프레임 → 1120 콘텐츠 폭, 섹션 띠는 화면 끝까지. 단일 라이트 테마(브랜드 레드 + 차콜 띠) */
+:root{
+  --red:#d7191f; --red-dk:#a80f14; --coral:#ff6b6b; --coral-lt:#ff8a8a;
+  --ink:#15171c; --ink-2:#23262e; --ink-3:#0e0f12;
+  --text:#3d4250; --muted:#5b6170; --muted-2:#8e93a0; --muted-3:#b9bdc7; --muted-4:#d6d9e0; --ph:#8a909c;
+  --line:#e3e5ea; --field:#c9cdd5; --soft:#f5f6f8; --soft-2:#edeff2; --soft-3:#f1f2f5;
+  --pink:#fdeded; --pink-2:#fff7f7; --pink-3:#fdf0f0; --pink-4:#ffe3e3; --pink-5:#fff1f1;
+  --green:#0b6b44; --green-2:#0f7b4f; --green-lt:#e7f5ee; --yellow:#ffe15a; --yellow-dk:#5a3d00;
+  --white:#fff;
+  --f-body:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-disp:"Black Han Sans","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --gut:max(16px,env(safe-area-inset-left,0px));
+  --gut-r:max(16px,env(safe-area-inset-right,0px));
+  --shadow:0 6px 16px rgba(21,23,28,.08);
+  --nav-h:72px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--white);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--white)}
+img{max-width:100%;display:block}
+a{color:inherit}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px;border-radius:6px}
+p,h1,h2,h3,h4{margin:0}
+.wrap{max-width:calc(1120px + 2*80px);margin:0 auto;padding-left:var(--gut);padding-right:var(--gut-r)}
+@media (min-width:1024px){.wrap{padding-left:80px;padding-right:80px}}
+section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-inset-top,0px))}
+.disp{font-family:var(--f-disp);font-weight:400;letter-spacing:-1px}
+.tag{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--red);border-radius:100px;padding:6px 14px;color:var(--red);font-weight:700;font-size:14px;line-height:1.3;background:var(--white)}
+.tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--red)}
+.sec-head{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.sec-head h2{font-size:clamp(28px,4.2vw,38px);line-height:1.25;text-wrap:balance}
+.sec-head p{color:var(--muted);font-size:17px;text-wrap:balance}
+.view[hidden]{display:none!important}
+
+/* ---------- NAV ---------- */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--white);border-bottom:1px solid var(--line)}
+.nav .wrap{height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:900;font-size:22px;letter-spacing:-.5px;color:var(--ink);white-space:nowrap}
+.logo img{width:29px;height:26px}
+.nav-links{display:flex;align-items:center;gap:24px}
+.nav-links .lnk{font-weight:500;color:var(--text);padding:8px 0;white-space:nowrap}
+.nav-links .lnk:hover{color:var(--red)}
+.btn-red{background:var(--red);color:var(--white);font-weight:700;border-radius:8px;padding:10px 18px;white-space:nowrap;transition:background .15s, transform .15s}
+.btn-red:hover{background:#c0141a}
+.tabs{display:flex;align-items:center;gap:6px}
+.tab{font-weight:700;color:var(--text);padding:10px 16px;border-radius:8px;white-space:nowrap;text-decoration:none;transition:background .15s,color .15s}
+.tab:hover{background:var(--soft)}
+.tab[aria-current="page"]{background:var(--red);color:var(--white)}
+.btn-outline{border:2px solid var(--red);color:var(--red);font-weight:700;padding:8px 16px;border-radius:8px;white-space:nowrap;transition:background .15s,color .15s}
+.btn-outline:hover{background:var(--red);color:var(--white)}
+.menu-btn{display:none;width:44px;height:44px;border-radius:10px;align-items:center;justify-content:center}
+.menu-btn span,.menu-btn span::before,.menu-btn span::after{display:block;width:22px;height:2px;background:var(--ink);border-radius:2px;position:relative;transition:transform .2s,background .2s}
+.menu-btn span::before,.menu-btn span::after{content:"";position:absolute;left:0}
+.menu-btn span::before{top:-7px}.menu-btn span::after{top:7px}
+.menu-open .menu-btn span{background:transparent}
+.menu-open .menu-btn span::before{transform:translateY(7px) rotate(45deg)}
+.menu-open .menu-btn span::after{transform:translateY(-7px) rotate(-45deg)}
+.tabs-mobile{display:none}
+@media (max-width:860px){
+  .menu-btn{display:inline-flex}
+  .nav-links{position:absolute;left:0;right:0;top:100%;background:var(--white);border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;gap:0;padding:8px var(--gut-r) 16px var(--gut);display:none;box-shadow:0 12px 24px rgba(21,23,28,.08)}
+  .menu-open .nav-links{display:flex}
+  .nav-links .lnk{padding:14px 4px;border-bottom:1px solid var(--soft);text-align:left}
+  .nav-links .btn-red{margin-top:12px;padding:14px}
+  .nav-ind .tabs{display:none}
+  .tabs-mobile{display:flex;gap:6px;overflow-x:auto;padding:8px var(--gut-r) 10px var(--gut);border-top:1px solid var(--soft);scrollbar-width:none}
+  .tabs-mobile::-webkit-scrollbar{display:none}
+  .tabs-mobile .tab{padding:8px 14px;font-size:15px}
+  .nav-ind .btn-outline{padding:7px 12px;font-size:15px}
+}
+
+/* ---------- HERO (home) ---------- */
+.hero{background:var(--red);color:var(--white);position:relative;overflow:hidden}
+.hero .wrap{position:relative;display:flex;align-items:center;gap:56px;padding-top:80px;padding-bottom:137px;min-height:775px}
+.hero-txt{width:564px;max-width:100%;display:flex;flex-direction:column;gap:25px;position:relative;z-index:2}
+.hero-eyebrow{font-weight:700;font-size:24px;color:var(--pink-4)}
+.hero h1{font-weight:500;font-size:48px;line-height:1.2;letter-spacing:-1.5px}
+.hero h1 strong{display:block;font-weight:900;font-size:70px}
+.hero-desc{font-size:18px;line-height:1.7;color:var(--pink-5)}
+.benefits{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.benefit{display:flex;align-items:center;gap:7px;font-weight:500;white-space:nowrap}
+.benefit img{width:53px;height:53px}
+.benefit-sep{width:1px;height:16px;background:rgba(255,255,255,.45)}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+.btn-white{background:var(--white);color:var(--red);font-weight:700;font-size:17px;border-radius:10px;padding:16px 28px;transition:transform .15s, box-shadow .15s}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(0,0,0,.18)}
+.btn-ghost{border:2px solid var(--white);color:var(--white);font-weight:700;font-size:17px;border-radius:10px;padding:14px 26px;transition:background .15s,color .15s}
+.btn-ghost:hover{background:var(--white);color:var(--red)}
+.hero-visual{width:500px;height:540px;position:relative;flex-shrink:0}
+.radar{position:absolute;width:800px;max-width:none;left:calc(50% - 70px);top:calc(50% + 43px);transform:translate(-50%,-50%);pointer-events:none;animation:radar 6s ease-in-out infinite}
+@keyframes radar{0%,100%{opacity:1}50%{opacity:.65}}
+.phone{position:absolute;left:40px;top:28px;width:280px;height:570px;background:var(--ink);border-radius:44px;box-shadow:0 30px 60px rgba(0,0,0,.5);overflow:hidden}
+.phone-scr{position:absolute;inset:12px;background:var(--soft);border-radius:34px;padding:36px 18px 18px;display:flex;flex-direction:column;gap:14px;color:var(--ink);overflow:hidden}
+.ph-site{font-size:12px;color:var(--muted)}
+.ph-hello{font-weight:700;font-size:19px;line-height:1.4}
+.ph-work{background:var(--red);color:var(--white);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.ph-badge{align-self:flex-start;background:var(--white);color:var(--red);font-weight:700;font-size:11px;border-radius:6px;padding:3px 8px}
+.ph-row{display:flex;justify-content:space-between;font-size:12px}
+.ph-row.big{font-weight:700;font-size:22px;font-variant-numeric:tabular-nums}
+.ph-btn{background:var(--white);color:var(--red);font-weight:700;font-size:13px;border-radius:20px;padding:9px;text-align:center;width:100%}
+.ph-btn.red{background:var(--red);color:var(--white)}
+.ph-card{background:var(--white);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.ph-card b{font-size:14px}
+.ph-card small{font-size:12px;color:var(--muted)}
+.ph-cond{flex-direction:row;justify-content:space-between;align-items:center;font-weight:700}
+.ph-cond span{font-size:12px;color:var(--green-2)}
+.sig-y{position:absolute;left:390px;top:84px;width:68px;height:68px;animation:pulse 2.4s ease-in-out infinite}
+.sig-w{position:absolute;width:32px;height:32px;z-index:1;animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.ph-toast{position:absolute;left:12px;right:12px;bottom:12px;background:var(--ink);color:var(--white);font-size:12px;border-radius:12px;padding:10px 12px;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none}
+.ph-toast.show{opacity:1;transform:none}
+@media (max-width:1100px){
+  .hero .wrap{flex-direction:column;align-items:flex-start;padding-top:56px;padding-bottom:140px;min-height:0;gap:24px}
+  .hero-visual{align-self:center}
+  .sig-w{display:none}
+}
+@media (max-width:560px){
+  .hero-eyebrow{font-size:18px}
+  .hero h1{font-size:30px;letter-spacing:-1px}
+  .hero h1 strong{font-size:48px}
+  .hero-desc{font-size:16px}
+  .hero-desc br,.ccard-txt br{display:none}
+  .benefit-sep{display:none}
+  .benefits{gap:4px 14px}
+  .benefits{gap:6px 10px}
+  .benefit{font-size:14px;gap:2px}
+  .benefit img{width:40px;height:40px}
+  .hero-ctas{flex-direction:column;align-self:stretch}
+  .hero-ctas button{width:100%}
+  .hero-visual{width:320px;height:600px;transform:scale(.92);transform-origin:top center;margin-bottom:-40px}
+  .phone{left:20px}
+  .sig-y{left:262px;top:60px}
+}
+
+/* ---------- LAW ---------- */
+.stripe{height:14px;background:repeating-linear-gradient(-55deg,var(--red) 0 10px,var(--white) 10px 20px)}
+.law{background:var(--ink);color:var(--white)}
+.law .wrap{padding-top:56px;padding-bottom:56px;display:flex;flex-direction:column;gap:28px}
+.law h2{font-weight:700;font-size:clamp(20px,2.6vw,28px);letter-spacing:-.5px;text-wrap:balance}
+.law-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.law-card{background:var(--ink-2);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:8px}
+.law-card .k{color:var(--muted-3)}
+.law-card .v{color:var(--coral);font-weight:900;font-size:22px;line-height:1.2}
+.law-card .v b{font-size:48px;font-weight:900}
+.law-card .s{color:var(--muted-4);font-size:14px}
+.law-foot{color:var(--muted-4);font-size:17px}
+@media (max-width:760px){.law-cards{grid-template-columns:1fr}.law-card .v b{font-size:40px}}
+
+/* ---------- FEATURES ---------- */
+.features .wrap{padding-top:96px;padding-bottom:0;display:flex;flex-direction:column;gap:48px}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat{background:var(--white);border-radius:18px;padding:28px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;transition:transform .2s, box-shadow .2s}
+.feat:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(21,23,28,.12)}
+.feat-top{display:flex;align-items:center;gap:12px}
+.ibox{width:48px;height:48px;border-radius:12px;background:var(--pink);display:grid;place-items:center;color:var(--red);flex-shrink:0}
+.ibox svg{width:26px;height:26px}
+.hbox{width:48px;height:48px;flex-shrink:0}
+.feat-num{color:var(--red);font-weight:700;font-size:18px}
+.feat h3{font-weight:700;font-size:22px}
+.feat p{color:var(--text);line-height:1.7}
+.feat.cloud{background:var(--red);color:var(--white);box-shadow:0 8px 20px rgba(215,25,31,.25);justify-content:flex-end;position:relative;overflow:hidden;min-height:238px}
+.feat.cloud p{color:var(--white);font-size:15px}
+.feat.cloud img{position:absolute;right:0;top:0;width:162px;height:144px}
+.feat.cloud h3,.feat.cloud p{position:relative}
+.flow-band{background:var(--pink);margin-top:48px}
+.flow{position:relative;display:grid;grid-template-columns:repeat(4,1fr);padding:32px var(--gut-r) 32px var(--gut);max-width:1120px;margin:0 auto}
+.flow::before{content:"";position:absolute;top:63px;left:12.5%;right:12.5%;height:3px;background:linear-gradient(90deg,rgba(242,184,186,.85),var(--red))}
+.flow-step{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;position:relative}
+.flow-c{width:64px;height:64px;border-radius:32px;background:var(--white);display:grid;place-items:center;position:relative;color:var(--red);transition:transform .2s}
+.flow-step:hover .flow-c{transform:scale(1.08)}
+.flow-c img,.flow-c svg{width:28px;height:28px}
+.flow-c.final{background:var(--red);color:var(--white);box-shadow:0 0 0 6px rgba(215,25,31,.18)}
+.flow-b{position:absolute;left:44px;top:-6px;background:var(--ink);color:var(--white);font-weight:700;font-size:12px;border-radius:10px;padding:2px 7px}
+.flow-c.final .flow-b{background:var(--yellow);color:var(--yellow-dk)}
+.flow-step b{font-size:16px}
+.flow-step.last b{color:var(--red-dk)}
+.flow-step small{font-size:13px;color:var(--muted)}
+@media (max-width:1024px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){
+  .feat-grid{grid-template-columns:1fr}
+  .features .wrap{padding-top:64px}
+  .flow-step b{font-size:13px}.flow-step small{font-size:12px}
+  .flow-c{width:52px;height:52px}.flow-c img,.flow-c svg{width:24px;height:24px}
+  .flow::before{top:57px}
+  .flow-b{left:34px}
+}
+
+/* ---------- INDUSTRY CARDS ---------- */
+.industry{background:var(--soft);position:relative;overflow:hidden}
+.industry .wrap{padding-top:96px;padding-bottom:96px;display:flex;flex-direction:column;gap:48px;position:relative}
+.industry-bg{position:absolute;left:0;bottom:-30px;font-family:var(--f-disp);font-size:200px;line-height:1;color:rgba(21,23,28,.04);white-space:nowrap;pointer-events:none}
+.ind-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.ind-card{background:var(--white);border-radius:18px;padding:32px 28px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden;text-decoration:none;color:var(--ink);min-height:303px;text-align:left;transition:box-shadow .2s, transform .2s}
+.ind-card:hover,.ind-card:focus-visible{box-shadow:0 14px 28px rgba(21,23,28,.14);transform:translateY(-4px)}
+.ind-card .num{position:absolute;right:22px;top:20px;font-family:var(--f-disp);font-size:64px;line-height:1;color:var(--soft-3)}
+.ind-card > img{width:70px;height:70px;position:relative}
+.ind-card .eb{color:var(--red);font-weight:700;font-size:13px}
+.ind-card h3{font-weight:900;font-size:26px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--pink);color:var(--red-dk);font-weight:700;font-size:14px;border-radius:6px;padding:4px 9px}
+.ind-card .go{margin-top:auto;align-self:flex-end;width:40px;height:40px;transition:transform .2s}
+.ind-card:hover .go{transform:translateX(4px)}
+@media (max-width:1024px){.ind-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.ind-grid{grid-template-columns:1fr}.ind-card{min-height:0}.industry .wrap{padding-top:64px;padding-bottom:64px}}
+
+/* ---------- COMPARE ---------- */
+.compare .wrap{padding-top:96px;padding-bottom:96px;display:flex;flex-direction:column;gap:40px}
+.cmp-scroll{overflow-x:auto;padding-top:14px;margin-top:-14px}
+.cmp{display:grid;grid-template-columns:314fr 402fr 402fr;min-width:560px;position:relative}
+.cmp > div{padding:22px 24px;display:flex;align-items:center;gap:6px;border-top:1px solid var(--line);font-size:16px}
+.cmp .h{background:var(--soft);font-weight:700;color:var(--text);border-top:0}
+.cmp .c1{color:var(--muted)}
+.cmp .c2{justify-content:center;color:var(--muted);text-align:center}
+.cmp .c3{justify-content:center;background:var(--pink-2);color:var(--red);font-weight:700;font-size:20px;text-align:center;border-left:2px solid var(--red);border-right:2px solid var(--red)}
+.cmp .h.c3{background:var(--red);color:var(--white);font-family:var(--f-disp);font-weight:400;font-size:24px;border-top:2px solid var(--red);border-radius:16px 16px 0 0;position:relative}
+.cmp .last.c3{border-bottom:2px solid var(--red);border-radius:0 0 16px 16px;box-shadow:0 10px 24px rgba(215,25,31,.15)}
+.cmp-frame{position:absolute;inset:0;border:1px solid var(--line);border-radius:18px;pointer-events:none}
+.cmp .h.c1{border-radius:18px 0 0 0}
+.badge-rec{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--yellow);color:#000;font-family:var(--f-body);font-weight:700;font-size:13px;border-radius:12px;padding:4px 14px}
+.cmp img{width:18px;height:18px;flex-shrink:0}
+.cmp svg{width:18px;height:18px;flex-shrink:0}
+.cmp-note{display:none;color:var(--muted);font-size:13px;text-align:right}
+@media (max-width:640px){
+  .cmp > div{padding:16px 12px;font-size:14px}.cmp .c3{font-size:15px}.cmp .h.c3{font-size:20px}
+  .cmp-note{display:block}
+  .compare .wrap{padding-top:64px;padding-bottom:64px}
+}
+
+/* ---------- APPLY ---------- */
+.apply{background:var(--ink);color:var(--white);position:relative;overflow:hidden}
+.apply .wrap{padding-top:96px;padding-bottom:96px;display:flex;align-items:center;gap:48px;position:relative}
+.apply-logo{position:absolute;right:-230px;bottom:-110px;width:660px;max-width:none;opacity:.08;filter:brightness(0) invert(1);pointer-events:none}
+@media (max-width:1024px){.apply-logo{width:440px;right:-80px;bottom:-110px}}
+.apply-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;position:relative}
+.apply-eb{color:var(--coral);font-weight:700}
+.apply-txt h2{font-weight:900;font-size:clamp(28px,3.4vw,38px);line-height:1.3;letter-spacing:-1px;text-wrap:balance}
+.perk{display:flex;gap:10px;font-size:17px}
+.perk b{color:var(--coral);white-space:nowrap}
+.perk span{color:var(--muted-4)}
+.apply-sub{color:var(--muted-4);font-size:17px;line-height:1.7}
+.asteps{display:flex;flex-direction:column;gap:16px}
+.astep{display:flex;gap:12px;align-items:flex-start}
+.astep i{font-style:normal;width:28px;height:28px;border-radius:14px;background:var(--red);display:grid;place-items:center;font-weight:700;font-size:14px;flex-shrink:0}
+.astep b{display:block;font-size:17px}
+.astep small{font-size:14px;color:var(--muted-3)}
+.form{width:520px;max-width:100%;flex-shrink:0;background:var(--white);color:var(--ink);border-radius:22px;padding:36px 32px;box-shadow:0 20px 25px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:18px;position:relative;z-index:1}
+.form h3{font-weight:900;font-size:24px}
+.form .lead{color:var(--muted);font-size:14px;margin-top:-12px}
+.fld{display:flex;flex-direction:column;gap:8px}
+.fld label{font-weight:700;font-size:14px}
+.fld input,.fld select{font:inherit;font-size:16px;color:var(--ink);background:var(--white);border:1px solid var(--field);border-radius:10px;padding:14px 16px;width:100%;transition:border-color .15s, box-shadow .15s;appearance:none;-webkit-appearance:none}
+.fld input::placeholder{color:var(--ph)}
+.fld select{background:var(--white) url("assets/chev.svg") no-repeat right 16px center/20px 20px;padding-right:44px}
+.fld select:invalid{color:var(--ph)}
+.fld input:focus,.fld select:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(215,25,31,.12)}
+.fld.err input,.fld.err select{border-color:var(--red)}
+.emsg{color:var(--red);font-size:13px;display:none}
+.fld.err .emsg,.agree.err + .emsg{display:block}
+.agree{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);cursor:pointer;user-select:none}
+.agree input{position:absolute;opacity:0;width:1px;height:1px}
+.agree .box{width:20px;height:20px;border:1.5px solid #9aa0ac;border-radius:4px;display:grid;place-items:center;flex-shrink:0;transition:.15s}
+.agree input:checked + .box{background:var(--red);border-color:var(--red)}
+.agree input:checked + .box::after{content:"";width:10px;height:6px;border:2px solid var(--white);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.agree input:focus-visible + .box{outline:3px solid var(--yellow);outline-offset:2px}
+.agree.err .box{border-color:var(--red)}
+.agree a{color:var(--muted);font-size:13px;margin-left:auto;white-space:nowrap}
+.submit{background:var(--red);color:var(--white);font-weight:700;font-size:18px;border-radius:12px;padding:18px;transition:background .15s}
+.submit:hover{background:#c0141a}
+.fbody{display:flex;flex-direction:column;gap:18px}
+.send-err{color:var(--red);font-size:14px;text-align:center;margin-top:-6px}
+.submit:disabled{opacity:.6;cursor:wait}
+.form .contact{text-align:center;color:var(--muted);font-size:13px}
+.done{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:24px 0}
+.done .ok{width:64px;height:64px;border-radius:50%;background:var(--pink);display:grid;place-items:center;color:var(--red)}
+.done .ok svg{width:32px;height:32px}
+.done h3{font-size:22px}
+.done p{color:var(--muted);font-size:15px}
+.summary{width:100%;background:var(--soft);border-radius:12px;padding:16px;display:grid;grid-template-columns:auto 1fr;gap:8px 16px;text-align:left;font-size:14px}
+.summary dt{color:var(--muted)}.summary dd{margin:0;font-weight:700;overflow-wrap:anywhere}
+.btn-line{border:1px solid var(--field);border-radius:10px;padding:12px 20px;font-weight:700;color:var(--text)}
+.btn-line:hover{border-color:var(--ink)}
+@media (max-width:1024px){.apply .wrap{flex-direction:column;align-items:stretch}.form{width:100%;max-width:560px;align-self:center}}
+@media (max-width:560px){.form{padding:28px 20px}.apply .wrap{padding-top:64px;padding-bottom:64px}.perk{font-size:15px}}
+
+/* ---------- FOOTER ---------- */
+.foot{background:var(--ink-3);color:var(--white)}
+.foot-top{display:flex;justify-content:space-between;gap:32px;padding-top:56px;padding-bottom:56px;flex-wrap:wrap}
+.foot-brand{display:flex;flex-direction:column;gap:14px;min-width:0}
+.foot-logo{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.foot-logo b{font-weight:900;font-size:20px}
+.foot-logo span{color:var(--muted-2);font-size:13px}
+.foot-info{color:var(--muted-3);font-size:14px;line-height:1.8}
+.foot-info span{white-space:nowrap}
+.foot-brand a{font-weight:700;font-size:14px;color:var(--white)}
+.stores{display:flex;gap:12px;flex-wrap:wrap}
+.stores a{display:block;transition:transform .15s}
+.stores a:hover{transform:translateY(-2px)}
+.stores img{height:48px;width:auto}
+.foot-bot{border-top:1px solid var(--ink-2)}
+.foot-bot .wrap{padding-top:20px;padding-bottom:140px;color:var(--muted-2);font-size:13px}
+
+/* ---------- STICKY BANNER ---------- */
+.sticky{position:fixed;left:50%;bottom:0;transform:translate(-50%,0);width:min(1120px,100%);z-index:40;padding-top:16px;transition:transform .3s ease, opacity .3s}
+.sticky.hide{transform:translate(-50%,110%);opacity:0;pointer-events:none}
+.sticky-pill{position:absolute;left:65px;top:0;background:var(--ink);border-radius:17px;padding:7px 18px;font-size:15px;display:flex;gap:8px;z-index:1;white-space:nowrap}
+.sticky-pill span{color:var(--coral-lt);font-weight:500}
+.sticky-pill b{color:var(--white)}
+.sticky-bar{background:var(--red);border-radius:18px 18px 0 0;min-height:80px;display:flex;align-items:center;justify-content:center;gap:40px;padding:14px 32px calc(14px + env(safe-area-inset-bottom,0px)) 40px;cursor:pointer;width:100%;box-shadow:0 -8px 24px rgba(21,23,28,.18)}
+.sticky-msg{display:flex;align-items:center;gap:16px;color:var(--white);font-weight:700;font-size:24px;white-space:nowrap}
+.sticky-msg img{width:43px;height:39px;filter:brightness(0) invert(1)}
+.sticky-msg .txt{display:block}
+.sticky-msg em{display:inline-block;font-style:normal;background:var(--white);color:var(--red);font-weight:900;border-radius:8px;padding:2px 8px;margin:0 3px 0 2px}
+.sticky-cta{background:var(--white);color:var(--red);font-weight:700;font-size:19px;border-radius:26px;height:52px;padding:0 30px 0 36px;display:flex;align-items:center;gap:12px;white-space:nowrap;transition:transform .15s}
+.sticky-bar:hover .sticky-cta{transform:translateX(4px)}
+.sticky-cta img{width:23px;height:23px}
+@media (max-width:1024px){.sticky-msg{font-size:19px}.sticky-cta{font-size:16px;height:44px;padding:0 18px 0 22px}.sticky-bar{gap:20px}}
+@media (max-width:760px){
+  .sticky-msg img,.sticky-msg .pre{display:none}
+  .sticky-pill{left:16px;font-size:12px;padding:5px 12px}
+  .sticky-bar{min-height:64px;padding:18px var(--gut-r) calc(12px + env(safe-area-inset-bottom,0px)) var(--gut);justify-content:space-between;border-radius:14px 14px 0 0}
+  .sticky-msg{font-size:16px;gap:0}
+  .sticky-msg em{margin:0 2px 0 0;font-size:16px}
+  .sticky-cta{height:40px;font-size:15px;padding:0 12px 0 16px;gap:4px}
+  .sticky-cta img{width:18px;height:18px}
+}
+@media (max-width:360px){.sticky-msg .post{display:none}}
+
+/* ---------- INDUSTRY PAGE ---------- */
+.ihero{background:var(--ink);color:var(--white);position:relative;overflow:hidden}
+.ihero .wrap{padding-top:72px;padding-bottom:72px;display:flex;flex-direction:column;gap:18px;position:relative;min-height:387px}
+.back{align-self:flex-start;color:var(--coral-lt);font-weight:700;font-size:15px}
+.back:hover{text-decoration:underline}
+.ihero .eb{color:var(--coral);font-weight:700;font-size:20px}
+.ihero h1{font-weight:900;font-size:46px;line-height:1.25;letter-spacing:-1.2px;max-width:780px;text-wrap:balance}
+.ihero p{color:var(--muted-4);font-size:18px;line-height:1.7;max-width:780px}
+.ihero-ill{position:absolute;right:80px;top:41px;width:300px;height:300px}
+.ihero h1,.ihero p{max-width:min(780px,calc(100% - 340px))}
+@media (max-width:1100px){.ihero-ill{right:16px;top:50%;transform:translateY(-50%);width:240px;height:240px}.ihero h1,.ihero p{max-width:calc(100% - 260px)}}
+@media (max-width:760px){.ihero h1{font-size:30px}.ihero p{font-size:16px}.ihero .eb{font-size:17px}.ihero-ill{position:static;transform:none;order:1;align-self:center;width:200px;height:200px;margin-top:8px}.ihero h1,.ihero p{max-width:100%}.ihero .wrap{padding-top:40px;padding-bottom:48px;min-height:0}}
+.ifeat{background-color:var(--white);background-image:radial-gradient(rgba(21,23,28,.18) 1px,transparent 1.2px);background-size:18px 18px}
+.ifeat .wrap{padding-top:88px;padding-bottom:88px;display:flex;flex-direction:column;gap:28px}
+.ifeat-head{display:flex;flex-direction:column;gap:32px;padding-bottom:12px}
+.ifeat-head .big{width:292px;height:200px;max-width:100%;object-fit:contain;object-position:left}
+.big-alt{width:200px;height:200px;border-radius:50%;background:var(--pink);display:grid;place-items:center;margin-left:40px}
+.big-alt img{width:110px;height:110px}
+.ifeat-head .t{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.ifeat-head h2{font-family:var(--f-disp);font-weight:400;font-size:clamp(26px,3.4vw,34px);letter-spacing:-1px;line-height:1.3}
+.ifeat-head h2 span{color:var(--red)}
+.irow{background:var(--white);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:36px;display:grid;grid-template-columns:1fr 1fr 28px 1fr;gap:16px;position:relative;overflow:hidden}
+.irow .bgnum{position:absolute;right:20px;top:-12px;font-family:var(--f-disp);font-size:96px;line-height:1.2;color:var(--soft-3);pointer-events:none}
+.irow-intro{display:flex;flex-direction:column;gap:14px;position:relative;min-width:0}
+.irow-intro .fbox{width:52px;height:52px}
+.irow-intro .ibox{width:52px;height:52px;border-radius:14px;background:var(--red);color:var(--white)}
+.irow-intro .ibox svg{width:28px;height:28px}
+.irow-intro h3{font-weight:900;font-size:26px}
+.irow-intro p{color:var(--text);line-height:1.7}
+.box-situ,.box-how{border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;position:relative;min-width:0}
+.box-situ{background:var(--soft)}
+.box-how{background:var(--pink)}
+.box-situ h4{color:var(--muted);font-size:18px;font-weight:700}
+.box-how h4{color:var(--red-dk);font-size:18px;font-weight:700}
+.situ{display:flex;gap:6px;line-height:1.6}
+.situ img{width:16px;height:26px;flex-shrink:0}
+.situ svg{width:16px;height:26px;flex-shrink:0;color:var(--red)}
+.steps{display:flex;flex-direction:column;gap:12px;position:relative}
+.step:not(:last-child)::before{content:"";position:absolute;left:9px;top:13px;bottom:-25px;width:2px}
+.step:nth-child(1)::before{background:linear-gradient(var(--red),#f2b8ba)}
+.step:nth-child(2)::before{background:linear-gradient(#f2b8ba,var(--ink))}
+.step{display:flex;gap:8px;align-items:flex-start;line-height:1.6;position:relative}
+.step i{font-style:normal;width:20px;height:20px;border-radius:10px;background:var(--red);color:var(--white);font-weight:700;font-size:11px;display:grid;place-items:center;flex-shrink:0;margin-top:3px;position:relative;z-index:1}
+.step:last-child i{background:#000}
+.arrow-wrap{display:flex;align-items:center;justify-content:center}
+.arrow-wrap img{width:28px;height:28px}
+@media (max-width:1024px){.irow{grid-template-columns:1fr 1fr}.irow-intro{grid-column:1/-1}.arrow-wrap{display:none}}
+@media (max-width:640px){.irow{grid-template-columns:1fr;padding:24px 20px}.ifeat .wrap{padding-top:56px;padding-bottom:56px}.box-situ,.box-how{padding:20px}.irow .bgnum{font-size:72px}.big-alt{margin-left:0;width:160px;height:160px}.big-alt img{width:88px;height:88px}}
+
+/* common section */
+.common{background:var(--soft)}
+.common .wrap{padding-top:96px;padding-bottom:96px;display:flex;flex-direction:column;gap:48px}
+.ccard{background:var(--white);border-radius:22px;box-shadow:var(--shadow);padding:40px;display:flex;align-items:center;gap:40px;position:relative;overflow:hidden}
+.ccard .bgico{position:absolute;right:-21px;bottom:-57px;width:200px;height:200px;color:#eceef2;pointer-events:none}
+.ccard .bgimg{position:absolute;right:0;bottom:0;pointer-events:none}
+.rbox{width:48px;height:48px;flex-shrink:0}
+.ccard-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;position:relative}
+.ccard-title{display:flex;align-items:center;gap:12px}
+.ccard-title .ibox{background:var(--red);color:var(--white)}
+.ccard-title h3{font-weight:900;font-size:28px}
+.ccard-txt p{color:var(--text);font-size:17px;line-height:1.7}
+.stats{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px;position:relative}
+.stats-row{display:flex;gap:12px}
+.stat{flex:1;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:6px;background:var(--soft);transition:transform .15s}
+.stat:hover{transform:translateY(-2px)}
+.stat span{font-weight:500;font-size:13px;color:var(--muted)}
+.stat b{font-family:var(--f-disp);font-weight:400;font-size:30px;line-height:1.1}
+.stat.on{background:var(--red);color:var(--white)}.stat.on span{color:var(--white)}
+.stat.off{background:var(--green-lt);color:var(--green)}.stat.off span{color:var(--green)}
+.stats small{color:var(--muted);font-size:13px}
+.learn{display:flex;gap:20px;align-items:center;position:relative;flex-shrink:0}
+.video{width:220px;height:132px;background:var(--ink);border-radius:12px;position:relative;display:grid;place-items:center;flex-shrink:0}
+.video .play{width:56px;height:56px;border-radius:50%;background:var(--red);display:grid;place-items:center;color:var(--white);transition:transform .15s}
+.video:hover .play{transform:scale(1.08)}
+.video .play svg{width:22px;height:22px}
+.video .time{position:absolute;right:12px;bottom:6px;color:var(--muted-4);font-weight:900;font-size:12px;font-variant-numeric:tabular-nums}
+.prog{width:260px;display:flex;flex-direction:column;gap:12px}
+.prog-lbl{display:flex;justify-content:space-between;font-weight:700;font-size:15px}
+.prog-lbl b{color:var(--red);font-variant-numeric:tabular-nums}
+.bar{height:12px;border-radius:6px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--red);border-radius:6px;transition:width .4s}
+.pbadges{display:flex;gap:8px;flex-wrap:wrap}
+.pb{display:flex;align-items:center;gap:4px;border-radius:8px;padding:6px 10px;font-weight:700;font-size:13px;white-space:nowrap}
+.pb img{width:16px;height:16px}
+.pb svg{width:16px;height:16px}
+.pb.g{background:var(--green-lt);color:var(--green)}.pb.r{background:var(--pink);color:var(--red-dk)}
+.cases{background:var(--pink-3);border-radius:22px;padding:40px;display:flex;flex-direction:column;gap:32px}
+.cases-h{display:flex;align-items:center;gap:12px}
+.cases-h .ibox{background:var(--red);color:var(--white)}
+.cases-h h3{font-family:var(--f-disp);font-weight:400;font-size:28px;line-height:1.3}
+.case-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.case{background:var(--white);border-radius:16px;box-shadow:0 4px 14px rgba(168,15,20,.1);overflow:hidden;display:flex;flex-direction:column}
+.case-ph{height:160px;background:var(--soft-2) center/cover no-repeat;position:relative}
+.case-ph span{position:absolute;left:14px;top:14px;background:var(--red);color:var(--white);font-weight:700;font-size:12px;border-radius:6px;padding:4px 10px}
+.case-b{padding:20px 20px 22px;display:flex;flex-direction:column;gap:10px;flex:1}
+.case-stat{display:flex;align-items:baseline;gap:4px;flex-wrap:wrap}
+.case-stat b{letter-spacing:-1.5px}
+.case-stat span{letter-spacing:-0.3px}
+.case-stat b{color:var(--red);font-weight:900;font-size:44px;line-height:1;white-space:nowrap}
+.case-stat span{white-space:nowrap}
+.case-stat b small{font-size:20px;letter-spacing:0}
+.case-stat span{color:var(--muted);font-size:13px}
+.case-stat .nostat{background:var(--pink);color:var(--red-dk);font-weight:700;border-radius:6px;padding:4px 9px}
+.case-b h4{font-weight:700;font-size:19px}
+.case-b p{color:var(--text);font-size:14px;line-height:1.65}
+.case-b .lesson{background:var(--pink);color:var(--red-dk);font-weight:500;font-size:13px;line-height:1.6;border-radius:10px;padding:10px 12px;text-align:center}
+.case-f{margin-top:auto;border-top:1px solid var(--line);padding-top:12px;display:flex;align-items:center;gap:8px;font-weight:700}
+.case-f img{width:18px;height:18px;flex-shrink:0}
+.case-f svg{width:18px;height:18px;color:var(--red)}
+.src{color:var(--muted);font-size:12px}
+@media (max-width:1024px){.ccard{flex-direction:column;align-items:stretch}.learn{flex-wrap:wrap}.case-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.case-stat b{font-size:44px}.case-b{padding:20px 14px 22px}.common .wrap{padding-top:64px;padding-bottom:64px}.ccard{padding:28px 20px;gap:24px}.cases{padding:28px 16px}.case-grid{grid-template-columns:1fr}.stat{padding:14px}.video{width:100%;height:auto;aspect-ratio:5/3;max-width:100%}.prog{width:100%}.cases-h h3{font-size:22px}}
+
+.toast{position:fixed;left:50%;bottom:calc(110px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--white);padding:12px 18px;border-radius:12px;font-size:14px;z-index:70;opacity:0;transition:.25s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+
+<!-- SVG icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-siren" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18v-5a5 5 0 0 1 10 0v5"/><path d="M5 21h14v-3H5z"/><path d="M12 3v2M4.2 6.2l1.4 1.4M19.8 6.2l-1.4 1.4M2 13h2M20 13h2"/><path d="M12 13v3"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.2 2.5h7.6l5.7 5.7v7.6l-5.7 5.7H8.2l-5.7-5.7V8.2z"/><path d="M8 12h8"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 22l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/><path d="M5 12h3.5l1.5-3 3 6 1.5-3H19"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 6.5V12l3.5 2.5"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="14" rx="2.5"/><path d="M10 8.2v5.6l4.6-2.8z" fill="currentColor"/><path d="M8 21h8"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 16 26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M8 7.5 1.5 18.5h13z"/><path d="M8 11.5v3.2M8 16.6v.1" stroke-linecap="round"/></symbol>
+    <symbol id="i-check-c" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="currentColor"/><path d="m6 10.3 2.6 2.6L14.2 7.4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-x-c" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#c9cdd5"/><path d="m7 7 6 6M13 7l-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="14" height="23" rx="3"/><path d="M12 21.5h4"/><path d="m10.5 11.5 2.5 2.5 4.5-4.5"/></symbol>
+    <symbol id="i-cloudlock" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20H7a5 5 0 0 1-.6-10A7 7 0 0 1 20 9a5.5 5.5 0 0 1 1 10.9"/><rect x="10.5" y="16" width="8" height="7" rx="1.5"/><path d="M12.5 16v-2a2 2 0 0 1 4 0v2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2.5 4.5 6v7c0 6 4 10.3 9.5 12.5 5.5-2.2 9.5-6.5 9.5-12.5V6z"/><path d="m9.5 14 3 3 6-6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-cert" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M4 5.5h5M4 8h3"/><circle cx="11.5" cy="9" r="1.8"/><path d="m10.5 10.6-.6 3 1.6-.8 1.6.8-.6-3"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11V7a4 4 0 0 1 8 0v4l1.3 1.5H2.7z"/><path d="M6.5 14a1.6 1.6 0 0 0 3 0"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 2.4 2.2 3.2-.4.9 3.1 2.9 1.5-1 3.1 1 3.1-2.9 1.5-.9 3.1-3.2-.4L12 22l-2.4-2.2-3.2.4-.9-3.1-2.9-1.5 1-3.1-1-3.1 2.9-1.5.9-3.1 3.2.4z"/><path d="M12 8v5M12 16v.1"/></symbol>
+    <symbol id="i-cap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 4 1.5 9 12 14l10.5-5z"/><path d="M6 11.3V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.7"/></symbol>
+    <symbol id="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  </defs>
+</svg>
+
+<!-- ================= NAV (home) ================= -->
+<header class="nav nav-home" id="navHome">
+  <div class="wrap">
+    <a class="logo" href="#home" data-top><img src="assets/logo-hd.png" alt="">안전비서</a>
+    <button class="menu-btn" id="menuBtn" aria-label="메뉴 열기" aria-expanded="false" aria-controls="navLinks"><span></span></button>
+    <nav class="nav-links" id="navLinks">
+      <button class="lnk" data-go="features">주요 기능</button>
+      <button class="lnk" data-go="industry">업종별 적용</button>
+      <button class="lnk" data-go="compare">타사 비교</button>
+      <button class="btn-red" data-go="apply">도입 상담 신청</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= NAV (industry) ================= -->
+<header class="nav nav-ind" id="navInd" hidden>
+  <div class="wrap">
+    <a class="logo" href="#home" data-top><img src="assets/logo-hd.png" alt="">안전비서</a>
+    <div class="tabs">
+      <a class="tab" href="#mfg" data-tab="mfg">제조업</a>
+      <a class="tab" href="#svc" data-tab="svc">서비스업</a>
+      <a class="tab" href="#con" data-tab="con">건설업</a>
+      <a class="tab" href="#shop" data-tab="shop">소상공인·시장</a>
+      <button class="btn-outline" data-go="apply">상담 신청</button>
+    </div>
+    <button class="btn-outline" data-go="apply" id="indCtaMobile" style="display:none">상담 신청</button>
+  </div>
+  <div class="tabs-mobile">
+    <a class="tab" href="#mfg" data-tab="mfg">제조업</a>
+    <a class="tab" href="#svc" data-tab="svc">서비스업</a>
+    <a class="tab" href="#con" data-tab="con">건설업</a>
+    <a class="tab" href="#shop" data-tab="shop">소상공인·시장</a>
+  </div>
+</header>
+
+<main>
+<!-- ================= HOME VIEW ================= -->
+<div class="view" id="viewHome">
+  <section class="hero">
+    <div class="wrap">
+      <img class="sig-w" src="assets/dot-white.svg" alt="" style="left:640px;top:533px">
+      <img class="sig-w" src="assets/dot-white.svg" alt="" style="left:1168px;top:469px">
+      <img class="sig-w" src="assets/dot-white.svg" alt="" style="left:656px;top:106px">
+      <div class="hero-txt">
+        <p class="hero-eyebrow">사장님, 걱정하지 마세요!</p>
+        <h1>중대재해처벌법 대응<br>전용 안전관리 시스템<strong>안전비서</strong></h1>
+        <p class="hero-desc">현장의 안전 활동을 시간·사용자 정보와 함께 기록하고, <br>사고가 나도 증명할 수 있는 증빙자료로 남깁니다.</p>
+        <div class="benefits">
+          <div class="benefit"><img src="assets/benefit-cloud.svg" alt="">용량 무제한</div>
+          <i class="benefit-sep"></i>
+          <div class="benefit"><img src="assets/benefit-people.svg" alt="">인원 무제한</div>
+          <i class="benefit-sep"></i>
+          <div class="benefit"><img src="assets/benefit-ai.svg" alt="">AI 리포트 무료</div>
+        </div>
+        <div class="hero-ctas">
+          <button class="btn-white" data-go="apply">무료 도입 상담 신청</button>
+          <button class="btn-ghost" data-go="industry">우리 업종 적용 방법 보기</button>
+        </div>
+      </div>
+      <div class="hero-visual" aria-label="안전비서 앱 화면 예시">
+        <img class="radar" src="assets/radar.svg" alt="">
+        <div class="phone">
+          <div class="phone-scr">
+            <p class="ph-site">안전택 현장</p>
+            <p class="ph-hello">김하늘님<br>오늘도 안전하세요!</p>
+            <div class="ph-work">
+              <span class="ph-badge" id="phBadge">근무중</span>
+              <div class="ph-row"><span>출근</span><span>퇴근</span></div>
+              <div class="ph-row big"><span id="phIn">06:40</span><span id="phOut">--:--</span></div>
+              <button class="ph-btn" id="phBtn">퇴근하기</button>
+            </div>
+            <div class="ph-card">
+              <b>안전신고</b>
+              <small>위험요소를 발견하셨나요?</small>
+              <button class="ph-btn red" id="phReport">안전신고 작성</button>
+            </div>
+            <div class="ph-card ph-cond"><b>오늘의 컨디션</b><span>양호</span></div>
+            <div class="ph-toast" id="phToast">신고가 관리자에게 전송되었어요 (예시)</div>
+          </div>
+        </div>
+        <img class="sig-y" src="assets/dot-yellow.svg" alt="">
+      </div>
+    </div>
+  </section>
+
+  <section class="law" aria-labelledby="lawH">
+    <div class="stripe"></div>
+    <div class="wrap">
+      <h2 id="lawH">2024년 1월부터, 5인 이상 사업장이면 중대재해처벌법 대상입니다</h2>
+      <div class="law-cards">
+        <div class="law-card"><p class="k">사망 사고 시 경영책임자</p><p class="v"><b>1</b>년 이상 징역</p><p class="s">또는 10억 원 이하 벌금</p></div>
+        <div class="law-card"><p class="k">사망 사고 시 법인</p><p class="v">최대 <b>50</b>억 원</p><p class="s">벌금</p></div>
+        <div class="law-card"><p class="k">고의·중과실 시</p><p class="v">손해액 최대 <b>5</b>배</p><p class="s">징벌적 손해배상</p></div>
+      </div>
+      <p class="law-foot">처벌을 피하는 길은 하나, 평소에 안전관리를 했다는 기록과 증빙입니다.</p>
+    </div>
+    <div class="stripe"></div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag">안전비서란?</span>
+        <h2 class="disp">현장 안전관리, 앱 하나로 기록부터 증빙까지</h2>
+        <p>5가지 핵심 기능이 모든 기록을 시간·사용자 정보와 함께 자동으로 남깁니다.</p>
+      </div>
+      <div class="feat-grid">
+        <article class="feat"><div class="feat-top"><img class="hbox" src="assets/hbox-siren.svg" alt="" width="48" height="48"><span class="feat-num">01</span></div><h3>안전신고</h3><p>위험을 발견하면 사진 한 장으로 바로 신고. 관리자의 조치 전·후 사진과 전자서명까지 수정 불가 기록으로 남습니다.</p></article>
+        <article class="feat"><div class="feat-top"><img class="hbox" src="assets/hbox-stop.svg" alt="" width="48" height="48"><span class="feat-num">02</span></div><h3>작업중지권</h3><p>위급 상황에 누구나 버튼 하나로 작업중지. 출근 중인 전원에게 무음 설정과 관계없이 경보가 울리고, 통제 로그가 자동 저장됩니다.</p></article>
+        <article class="feat"><div class="feat-top"><img class="hbox" src="assets/hbox-heart.svg" alt="" width="48" height="48"><span class="feat-num">03</span></div><h3>컨디션관리</h3><p>근골격계 질환·직무스트레스 등 주의가 필요한 근로자를 관리자 화면에서 실시간으로 확인하고 미리 대응합니다.</p></article>
+        <article class="feat"><div class="feat-top"><img class="hbox" src="assets/hbox-clock.svg" alt="" width="48" height="48"><span class="feat-num">04</span></div><h3>출근하기</h3><p>현장에서 버튼 한 번으로 출퇴근. 작업 전 안전점검(TBM) 참석과 전자서명이 함께 기록됩니다.</p></article>
+        <article class="feat"><div class="feat-top"><img class="hbox" src="assets/hbox-play.svg" alt="" width="48" height="48"><span class="feat-num">05</span></div><h3>이러닝</h3><p>법정 안전교육을 휴대폰으로 수강. 차시별 이수율, 수료증, 전자서명이 자동 저장되고 미이수자도 한눈에 관리합니다.</p></article>
+        <article class="feat cloud"><img src="assets/cloud-white.svg" alt=""><h3>모든 기록은 클라우드에</h3><p>모바일 기록 → 관리자 확인 → 클라우드 저장 → 법적 증빙 자료 확보까지 자동으로 이어집니다.</p></article>
+      </div>
+    </div>
+    <div class="flow-band">
+      <div class="flow" aria-label="증빙 흐름">
+        <div class="flow-step"><div class="flow-c"><img src="assets/flow-1-hd.png" alt=""><span class="flow-b">01</span></div><b>현장 기록</b><small>사진·서명</small></div>
+        <div class="flow-step"><div class="flow-c"><img src="assets/flow-2-hd.png" alt=""><span class="flow-b">02</span></div><b>관리자 확인</b><small>조치 전·후</small></div>
+        <div class="flow-step"><div class="flow-c"><img src="assets/flow-3-hd.png" alt=""><span class="flow-b">03</span></div><b>클라우드 저장</b><small>수정 불가</small></div>
+        <div class="flow-step last"><div class="flow-c final"><img src="assets/flow-4-hd.png" alt=""><span class="flow-b">04</span></div><b>법적 증빙</b><small>사고 시 제출</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="industry" id="industry">
+    <div class="stripe"></div>
+    <div class="industry-bg" aria-hidden="true">INDUSTRY</div>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag">업종별 적용 방법</span>
+        <h2 class="disp">우리 업종에서는 이렇게 씁니다</h2>
+        <p>업종을 선택하면 현장에 맞는 활용법을 자세히 보여드려요.</p>
+      </div>
+      <div class="ind-grid" id="indGrid"></div>
+    </div>
+  </section>
+
+  <section class="compare" id="compare">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag">타사 비교</span>
+        <h2 class="disp">같은 안전관리, 비용은 다릅니다</h2>
+        <p>용량 무제한, 인원 무제한, AI 분석까지. 안전을 위한 투자에 한계를 두지 마세요.</p>
+      </div>
+      <div>
+        <p class="cmp-note">← 좌우로 밀어서 보기</p>
+        <div class="cmp-scroll">
+          <div class="cmp" id="cmp"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= INDUSTRY VIEW ================= -->
+<div class="view" id="viewInd" hidden>
+  <section class="ihero">
+    <div class="wrap">
+      <a class="back" href="#home">← 홈으로</a>
+      <p class="eb" id="iEb"></p>
+      <h1 id="iTitle"></h1>
+      <p id="iDesc"></p>
+      <img class="ihero-ill" id="iIll" alt="">
+    </div>
+  </section>
+  <section class="ifeat" id="ifeat">
+    <div class="wrap" id="iFeatWrap"></div>
+  </section>
+  <section class="common">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag">모든 업종 공통</span>
+        <h2 class="disp">출근부터 교육까지, 기본은 똑같이 튼튼하게</h2>
+      </div>
+      <div class="ccard">
+        <img class="bgimg" src="assets/bg-clock.svg" alt="" width="179" height="143">
+        <div class="ccard-txt">
+          <div class="ccard-title"><img class="rbox" src="assets/rbox-clock.svg" alt="" width="48" height="48"><h3>출근하기</h3></div>
+          <p>현장에 도착하면 버튼 한 번으로 출근. 그날의 안전점검(TBM) 참석과 전자서명이 출근 기록과 함께 남습니다.</p>
+        </div>
+        <div class="stats">
+          <div class="stats-row">
+            <div class="stat"><span>출근전</span><b id="stBefore">3</b></div>
+            <div class="stat on"><span>근무중</span><b id="stOn">8</b></div>
+            <div class="stat off"><span>퇴근</span><b id="stOff">4</b></div>
+          </div>
+          <small>관리자 화면 예시 · 오늘의 근무 현황</small>
+        </div>
+      </div>
+      <div class="ccard">
+        <img class="bgimg" src="assets/bg-cap.svg" alt="" width="184" height="156">
+        <div class="ccard-txt">
+          <div class="ccard-title"><img class="rbox" src="assets/rbox-play.svg" alt="" width="48" height="48"><h3>이러닝</h3></div>
+          <p>법정 안전교육을 휴대폰으로 수강하고, 수료증과 전자서명이 자동으로 증빙자료가 됩니다. 실제 사고사례로 배우니 현장에서 바로 기억합니다.</p>
+        </div>
+        <div class="learn">
+          <button class="video" id="video" aria-label="교육 영상 미리보기 재생">
+            <span class="play" id="playIco"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+            <span class="time" id="vTime">05:20</span>
+          </button>
+          <div class="prog">
+            <div class="prog-lbl"><span>이수율</span><b id="pct">80%</b></div>
+            <div class="bar"><i id="barFill" style="width:80%"></i></div>
+            <div class="pbadges">
+              <span class="pb g"><img src="assets/badge-cert.svg" alt="" width="16" height="16">수료증 자동 발급</span>
+              <span class="pb r"><img src="assets/badge-bell.svg" alt="" width="16" height="16">미이수 알림</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cases">
+        <div class="cases-h"><img class="rbox" src="assets/rbox-alert.svg" alt="" width="48" height="48"><h3>이런 사고, 막을 수 있었습니다</h3></div>
+        <div class="case-grid" id="caseGrid"></div>
+        <p class="src" id="caseSrc">출처: 고용노동부 2025년 재해조사 대상 사고사망 통계</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= APPLY (shared) ================= -->
+<section class="apply" id="apply">
+  <img class="apply-logo" src="assets/logo-hd.png" alt="">
+  <div class="wrap">
+    <div class="apply-txt" id="applyHome">
+      <p class="apply-eb">스페셜 프로모션</p>
+      <h2>지금 상담 신청하면<br>3대 혜택을 드립니다</h2>
+      <p class="perk"><b>혜택 1</b><span>클라우드 저장 용량 무제한</span></p>
+      <p class="perk"><b>혜택 2</b><span>인원 등록 무제한</span></p>
+      <p class="perk"><b>혜택 3</b><span>위험성 평가 맞춤형 AI 리포트 전면 무료</span></p>
+    </div>
+    <div class="apply-txt" id="applyInd" hidden>
+      <p class="apply-eb" id="aEb"></p>
+      <h2 id="aTitle"></h2>
+      <p class="apply-sub">용량 무제한 · 인원 무제한 · AI 위험성 평가 리포트 무료</p>
+      <div class="asteps">
+        <div class="astep"><i>1</i><div><b>상담 신청</b><small>1분이면 끝나는 간단한 정보 입력</small></div></div>
+        <div class="astep"><i>2</i><div><b>담당자 연락</b><small>우리 현장에 맞는 맞춤 상담</small></div></div>
+        <div class="astep"><i>3</i><div><b>설치·교육 후 바로 사용</b><small>현장 근로자 사용법 안내까지</small></div></div>
+      </div>
+    </div>
+
+    <form class="form" id="form" novalidate>
+      <div id="formBody" class="fbody">
+        <h3>무료 도입 상담 신청</h3>
+        <p class="lead">정보를 남겨주시면 담당자가 연락드립니다.</p>
+        <div class="fld" id="f-company"><label for="company">회사명</label><input id="company" name="company" placeholder="예) 안전택" autocomplete="organization"><span class="emsg">회사명을 입력해주세요.</span></div>
+        <div class="fld" id="f-name"><label for="name">담당자명</label><input id="name" name="name" placeholder="이름을 입력해주세요" autocomplete="name"><span class="emsg">담당자 이름을 입력해주세요.</span></div>
+        <div class="fld" id="f-phone"><label for="phone">연락처</label><input id="phone" name="phone" placeholder="010-0000-0000" inputmode="tel" autocomplete="tel" maxlength="13"><span class="emsg">연락처를 010-0000-0000 형식으로 입력해주세요.</span></div>
+        <div class="fld" id="f-ind"><label for="ind">업종</label>
+          <select id="ind" name="ind" required>
+            <option value="" disabled selected>업종을 선택해주세요</option>
+            <option value="제조업">제조업</option>
+            <option value="서비스업">서비스업</option>
+            <option value="건설업">건설업</option>
+            <option value="소상공인·시장">소상공인·시장</option>
+            <option value="기타">기타</option>
+          </select><span class="emsg">업종을 선택해주세요.</span></div>
+        <div>
+          <label class="agree" id="agreeL"><input type="checkbox" id="agree"><span class="box"></span>개인정보 수집·이용에 동의합니다 (필수)<a href="https://sites.google.com/view/consent-to-the-use-of-personal/full-page-embed" target="_blank" rel="noopener">보기</a></label>
+          <span class="emsg" style="margin-top:6px">개인정보 수집·이용에 동의해주세요.</span>
+        </div>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+        <button class="submit" type="submit" id="submitBtn">상담 신청하기</button>
+        <p class="send-err" id="sendErr" hidden>신청을 보내지 못했어요. 잠시 후 다시 시도하시거나 031-698-4349로 연락주세요.</p>
+        <p class="contact">문의 031-698-4349 · safetytech0489@gmail.com</p>
+      </div>
+      <div class="done" id="done" hidden>
+        <span class="ok"><svg><use href="#i-ok"/></svg></span>
+        <h3>상담 신청이 완료되었어요</h3>
+        <p>남겨주신 연락처로 담당자가 연락드립니다.</p>
+        <dl class="summary" id="summary"></dl>
+        <button type="button" class="btn-line" id="again">다시 작성하기</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap foot-top">
+    <div class="foot-brand">
+      <div class="foot-logo"><img src="assets/logo-hd.png" alt="" width="29" height="26"><b>안전비서</b><span>by 안전택 SAFETYTECH</span></div>
+      <p class="foot-info"><span>상호 안전택</span> · <span>대표 임지원</span> · <span>사업자등록번호 873-08-03323</span><br><span>경기도 성남시 분당구 대왕판교로 645번길 12, 7층 7호</span><br><span>연락처 031-698-4349</span> · <span>이메일 safetytech0489@gmail.com</span></p>
+      <a href="https://sites.google.com/view/consent-to-the-use-of-personal/full-page-embed" target="_blank" rel="noopener">개인정보처리방침</a>
+    </div>
+    <div class="stores">
+      <a href="https://apps.apple.com/kr/app/%EC%95%88%EC%A0%84%EB%B9%84%EC%84%9C/id6785765250" target="_blank" rel="noopener"><img src="assets/badge-appstore.svg" alt="App Store에서 다운로드" width="144" height="48"></a>
+      <a href="https://play.google.com/store/apps/details?id=com.safetysecretary.safetysecretary" target="_blank" rel="noopener"><img src="assets/badge-googleplay.svg" alt="Google Play에서 다운로드" width="162" height="48"></a>
+    </div>
+  </div>
+  <div class="foot-bot"><div class="wrap">© 안전택 SAFETYTECH. All rights reserved.</div></div>
+</footer>
+</main>
+
+<!-- ================= STICKY BANNER ================= -->
+<div class="sticky" id="sticky">
+  <div class="sticky-pill"><span>5인 이상 사업장</span><b>의무 적용 중</b></div>
+  <button class="sticky-bar" data-go="apply" aria-label="무료 상담 신청으로 이동">
+    <span class="sticky-msg"><img src="assets/logo-hd.png" alt=""><span class="txt"><span class="pre">중대재해 대비, </span><em>안전비서</em><span class="post">로 시작하세요</span></span></span>
+    <span class="sticky-cta">무료 상담 신청<img src="assets/cta-arrow.svg" alt="" width="23" height="23"></span>
+  </button>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const icon = id => `<svg><use href="#i-${id}"/></svg>`;
+
+  const IND = {
+    mfg: { n:'01', name:'제조업', icon:'assets/ind-mfg-hd.png', chips:['끼임','물체에 맞음','지게차'],
+      hero:['설비와 라인이 멈추기 전에,','위험을 먼저 멈춥니다'], desc:'끼임·협착, 설비 이상, 교대근무 피로까지. 제조 현장에 맞춘 안전비서 활용법입니다.',
+      ill:'assets/hero-mfg.png', big:'assets/big-mfg.png', tag:'제조업 맞춤 기능', hl:'제조 현장',
+      aEb:'제조업 도입 상담', aTitle:'우리 공장에 맞는 설정,', feats:[
+        ['안전신고','방호장치 고장, 끼임 위험 구간을 발견한 즉시 사진으로 신고하고 조치까지 기록합니다.',['프레스·컨베이어 방호장치가 해제·고장난 경우','회전체·롤러 등 끼임 위험 구간 발견','통로 적재물, 바닥 기름 등 넘어짐 위험'],['위험 사진 촬영 + 위험 유형 선택','관리자 즉시 알림 → 조치 후 사진 등록','수정 불가 로그로 보관']],
+        ['작업중지권','설비 이상이나 유해물질 누출 시, 현장 누구나 버튼 하나로 라인 작업을 멈출 수 있습니다.',['설비 이상음·과열·오작동 감지','화학물질·가스 누출 의심','화재·정전 등 라인 전체 위험'],['긴급 알림 버튼으로 작업중지 발동','출근 근로자 전원 경보 (무음 포함)','중지·재개 시각과 조치 내용 자동 기록']],
+        ['컨디션관리','교대·야간 근무자의 피로와 건강 상태를 매일 확인해, 위험한 작업 배치를 미리 조정합니다.',['야간·연속 교대 근무로 피로 누적','고열 작업장의 온열질환 위험','반복 작업으로 인한 근골격계 부담'],['출근 시 컨디션 자가 체크','주의 대상자 관리자 화면에 실시간 표시','휴식·작업 전환 등 조치 이력 저장']]]},
+    svc: { n:'02', name:'서비스업', icon:'assets/ind-svc-hd.png', chips:['넘어짐','베임','배달 사고'],
+      hero:['손님 앞에서도, 주방 안에서도','사고 없는 하루를 만듭니다'], desc:'미끄러짐·화상·감정노동까지. 매장과 고객 응대 현장에 맞춘 안전비서 활용법입니다.',
+      ill:'assets/hero-svc.png', big:'assets/big-svc.png', tag:'서비스업 맞춤 기능', hl:'서비스 현장',
+      aEb:'서비스업 도입 상담', aTitle:'우리 매장에 맞는 설정,', feats:[
+        ['안전신고','젖은 바닥, 주방 화기처럼 매일 마주치는 위험을 직원 누구나 바로 신고하고 기록합니다.',['물·기름에 젖은 바닥, 미끄러운 계단','주방 칼·화기·뜨거운 조리기구 위험','창고 선반 적재물 낙하 위험'],['위험 장소 사진 촬영 후 바로 신고','점장·관리자 알림 → 조치 후 사진 등록','매장별 신고·조치 이력 자동 정리']],
+        ['작업중지권','가스 냄새나 화재 경보 같은 위급 상황에, 영업 중이라도 즉시 업무를 멈추고 대피를 알립니다.',['주방 가스 냄새·누출 의심','화재 경보·연기 발생','고객 폭언·폭행 등 직원 안전 위협'],['긴급 알림 버튼으로 업무 중지 발동','근무 중인 직원 전원 경보·대피 안내','상황 종료까지 통제 로그 자동 기록']],
+        ['컨디션관리','오래 서서 일하고 고객을 응대하는 직원의 몸과 마음 상태를 확인해, 휴식과 근무를 조정합니다.',['장시간 서서 근무로 다리·허리 부담','감정노동으로 인한 직무스트레스','주말·성수기 연속 근무 피로'],['출근 시 컨디션 자가 체크','주의 대상 직원을 관리자가 바로 확인','휴식·업무 조정 이력 저장']]]},
+    con: { n:'03', name:'건설업', icon:'assets/ind-con-hd.png', chips:['추락','붕괴','낙하물'],
+      hero:['매일 바뀌는 현장,','위험 기록은 놓치지 않습니다'], desc:'추락·붕괴·기상 악화·외국인 근로자 소통까지. 건설 현장에 맞춘 안전비서 활용법입니다.',
+      ill:'assets/hero-con.png', big:'assets/big-con.png', tag:'건설업 맞춤 기능', hl:'건설 현장',
+      aEb:'건설업 도입 상담', aTitle:'우리 현장에 맞는 설정,', feats:[
+        ['안전신고','개구부, 안전난간 미설치처럼 추락으로 이어지는 위험을 위치와 함께 사진으로 남깁니다.',['개구부 덮개·안전난간 미설치','비계·작업발판 결함, 고정 불량','장비 주변 보행자 충돌 위험'],['위험 구간 사진 + 위험 유형 선택','현장 관리자 알림 → 조치 후 사진 등록','공정별·구역별 조치 이력 자동 정리']],
+        ['작업중지권','강풍·폭우나 붕괴 징후가 보이면, 협력업체 인원까지 현장 전체에 즉시 작업중지를 알립니다.',['강풍·폭우·폭염 등 기상 악화','흙막이·거푸집 붕괴 징후','크레인·중장비 이상 작동'],['긴급 알림 버튼으로 전체 작업중지','출근 인원 전원 경보 · 대피 안내','중지 사유·재개 시각 자동 기록']],
+        ['컨디션관리','작업 전 근로자 건강 상태를 확인하고, 실시간 번역으로 외국인 근로자도 쉽게 응답합니다.',['폭염기 고령·신규 근로자 온열질환 위험','고소 작업 전 어지럼증·컨디션 저하','언어 장벽으로 상태 파악이 어려운 경우'],['출근 시 다국어 컨디션 체크','주의 대상자 고소·중작업 배치 제외','휴식·배치 조정 이력 저장']]]},
+    shop: { n:'04', name:'소상공인·시장', icon:'assets/ind-shop-hd.png', chips:['사다리','식품 기계','혼자 근무'],
+      hero:['직원이 몇 명이든,','안전 기록은 사장님 폰 하나로'], desc:'안전 담당자를 따로 둘 여유가 없어도 괜찮아요. 작은 매장에 맞춘 안전비서 활용법입니다.',
+      ill:'assets/hero-shop.png', big:'assets/big-shop.png', tag:'소상공인·시장 맞춤 기능', hl:'소상공인·시장',
+      aEb:'소상공인·시장 도입 상담', aTitle:'우리 가게에 맞는 설정,', feats:[
+        ['안전신고','매장 안 위험 요소를 사진 한 장으로 기록하고, 사장님이 휴대폰으로 바로 확인·조치합니다.',['오븐·튀김기 등 화상 위험 기기','낡은 전기 배선·멀티탭 과부하','좁은 창고·계단 넘어짐 위험'],['직원이 위험 사진 찍어 신고','사장님 폰으로 알림 → 조치 후 사진 등록','신고·조치 이력이 자동으로 증빙 정리']],
+        ['작업중지권','사장님이 자리에 없어도, 화재·정전 같은 위급 상황이면 근무 중인 직원 전원에게 즉시 알립니다.',['주방·매장 화재, 연기 발생','정전·누전·가스 냄새','사장님 부재 중 위급 상황'],['직원 누구나 긴급 알림 발동','근무 직원 전원 + 사장님 동시 경보','대응 과정 로그 자동 기록']],
+        ['컨디션관리','아르바이트·단시간 근로자가 자주 바뀌어도, 출근할 때마다 컨디션을 확인하고 이력을 이어갑니다.',['잦은 인력 교체로 직원 상태 파악이 어려움','혼자 근무하는 시간대의 건강 이상','바쁜 시간대 연속 근무 피로'],['출근 시 30초 컨디션 체크','주의 직원은 사장님 폰에 바로 표시','직원이 바뀌어도 관리 이력 유지']]]}
+  };
+  const FEAT_ICONS = ['siren','stop','heart'];
+
+  /* industry cards on home */
+  $('#indGrid').innerHTML = Object.entries(IND).map(([k,d]) => `
+    <a class="ind-card" href="#${k}">
+      <span class="num">${d.n}</span>
+      <img src="${d.icon}" alt="">
+      <p class="eb">INDUSTRY ${d.n}</p>
+      <h3>${d.name}</h3>
+      <div class="chips">${d.chips.map(c=>`<span class="chip">${c}</span>`).join('')}</div>
+      <img class="go" src="assets/arrow-btn-hd.png" alt="">
+    </a>`).join('');
+
+  /* compare table */
+  const rows = [['클라우드 저장 용량','10GB당 10만 원','무제한 무료'],['시스템 사용 인원','1명당 5,000원','무제한 무료'],['위험성 평가','기본 기능만 제공','AI 맞춤형 리포트 무료'],['AI로 관리','수기로 작성','AI가 위험 분석·보고서 자동 작성'],['작업중지권 · 컨디션관리','기본 미포함','기본 포함']];
+  $('#cmp').innerHTML = `<span class="cmp-frame"></span><div class="h c1">비교 항목</div><div class="h c2">A사</div><div class="h c3">안전비서<span class="badge-rec">추천</span></div>` +
+    rows.map((r,i) => { const l = i === rows.length-1 ? ' last' : '';
+      return `<div class="c1${l}">${r[0]}</div><div class="c2${l}"><img src="assets/cmp-x.svg" alt="" width="18" height="18">${r[1]}</div><div class="c3${l}" style="color:var(--red)"><img src="assets/cmp-check.svg" alt="" width="18" height="18">${r[2]}</div>`; }).join('');
+
+
+  /* accident cases: 공통 기본 + 업종별 덮어쓰기 */
+  const CASES_DEFAULT = [
+    {img:'case-fall-con.jpg', alt:'건설 현장 사고 사진', num:'249', note:'2025년 사망 · 1위', title:'떨어짐 (추락)', desc:'사다리·지붕·작업발판 위에서 작업하다 추락하는 사고. 모든 업종에서 가장 많이 일어납니다.', lesson:'"안전난간이 없다는 신고 한 건이면 막을 수 있었습니다"', ico:'siren', fix:'안전신고로 예방'},
+    {img:'case-caught.jpg', alt:'가동 중인 컨베이어 라인 사진', num:'50', note:'2025년 사망', title:'끼임', desc:'기계를 멈추지 않고 정비·청소하다 롤러나 컨베이어에 끼이는 사고. 제조업의 대표 사고입니다.', lesson:'"이상을 느낀 순간, 누구나 라인을 멈출 수 있어야 합니다"', ico:'stop', fix:'작업중지권으로 예방'},
+    {img:'case-hit.jpg', alt:'지게차 부딪힘 사고 사진', num:'62', note:'2025년 사망 · 증가', title:'부딪힘', desc:'지게차·굴착기 등 장비가 이동하거나 후진하다 작업자와 충돌하는 사고입니다.', lesson:'"작업 전 안전점검에서 장비 동선만 공유했어도"', ico:'clock', fix:'출근하기(TBM)로 예방'}
+  ];
+  const CASES_SRC = { con:'출처: 고용노동부 2025년 재해조사 대상 사고사망 통계(전 업종 기준)', svc:'출처: 고용노동부 2025년 산업재해 현황(승인일 기준, 전 업종)', mfg:'출처: 고용노동부 2025년 재해조사 대상 사고사망 통계(전 업종 기준)' };
+  const CASES_BY = {
+    mfg: [
+      {img:'case-fall-con.jpg', alt:'크레인 인양물이 떨어져 트럭을 덮친 사고 사진', num:'72', note:'2025년 사망 · 전 업종', title:'물체에 맞음', desc:'크레인 인양물이나 높이 쌓은 적재물이 떨어져 작업자를 덮치는 사고입니다.', lesson:'"적재 불량, 사진 한 장으로 먼저 알렸다면"', ico:'siren', fix:'안전신고로 예방'},
+      {img:'case-caught.jpg', alt:'가동 중인 컨베이어 라인 사진', num:'50', note:'2025년 사망 · 제조업 대표 사고', title:'끼임', desc:'기계를 멈추지 않고 정비·청소하다 롤러나 컨베이어에 끼이는 사고입니다.', lesson:'"이상을 느낀 순간,<br>누구나 라인을 멈출 수 있어야 합니다"', ico:'stop', fix:'작업중지권으로 예방'},
+      {img:'case-hit.jpg', alt:'지게차 옆에 쓰러진 작업자 사진', num:'62', note:'2025년 사망 · 전 업종, 증가', title:'부딪힘', desc:'공장 안을 오가는 지게차가 후진하다 작업자와 충돌하는 사고입니다.', lesson:'"작업 전 안전점검에서 지게차 동선만 공유했어도"', ico:'clock', fix:'출근하기(TBM)로 예방'}
+    ],
+    con: [
+      {img:'case-con-fall-hd.jpg', alt:'철골 위에서 안전대를 걸고 작업하는 사진', num:'249', note:'2025년 사망 · 전 업종 1위', title:'떨어짐 (추락)', desc:'개구부나 안전난간이 없는 작업발판, 비계에서 떨어지는 사고입니다.', lesson:'"안전난간이 없다는 신고 한 건이면<br>막을 수 있었습니다"', ico:'siren', fix:'안전신고로 예방'},
+      {img:'case-con-collapse.jpg', pos:'center 78%', alt:'굴착면이 무너진 현장 사진', num:'38', note:'2025년 사망 · 전 업종', title:'무너짐', desc:'흙막이·거푸집이 무너지거나 굴착면이 붕괴하는 사고입니다.', lesson:'"붕괴 징후가 보이면,<br>현장 전체를 즉시 멈춰야 합니다"', ico:'stop', fix:'작업중지권으로 예방'},
+      {img:'case-con-struck.jpg', alt:'자재가 떨어져 흩어진 건설 현장 사진', num:'72', note:'2025년 사망 · 전 업종', title:'물체에 맞음', desc:'크레인으로 들어 올린 자재가 떨어지거나 공구가 낙하해 맞는 사고입니다.', lesson:'"인양 구역을 작업 전에 공유하고 서명했다면"', ico:'clock', fix:'출근하기(TBM)로 예방'}
+    ],
+    shop: [
+      {img:'case-shop-fall.jpg', pos:'center 62%', alt:'사다리에서 떨어진 작업자 사진', num:'249', note:'2025년 사망 · 전 업종 1위', title:'떨어짐 (추락)', desc:'간판 정리, 창고 정리처럼 사다리에 올라가는 일상 작업에서 떨어지는 사고입니다.', lesson:'"흔들리는 사다리, 미리 알리고 바꿨다면"', ico:'siren', fix:'안전신고로 예방'},
+      {img:'case-shop-caught-hd.jpg', alt:'반죽기로 반죽하는 사진', num:'50', note:'2025년 사망 · 전 업종', title:'끼임', desc:'반죽기·분쇄기 같은 식품 기계를 청소하거나 재료를 넣다 끼이는 사고입니다.', lesson:'"기계를 끄고 멈춘 뒤에 손을 넣어야 합니다"', ico:'stop', fix:'작업중지권으로 예방'},
+      {img:'case-shop-small.jpg', alt:'밤 시장에서 혼자 일하는 상인 사진', num:'174', note:'2025년 사망 · 5인 미만 사업장', title:'작은 사업장의 사고', desc:'사망 사고의 약 29%가 5인 미만 사업장에서 일어났습니다. 혼자 일하는 시간이 길수록 위험합니다.', lesson:'"누가 지금 근무 중인지, 사장님이 알고 있었다면"', ico:'clock', fix:'출근하기로 예방'}
+    ],
+    svc: [
+      {img:'case-slip.jpg', alt:'주방 젖은 바닥에서 미끄러지는 사진', num:'28,606', note:'2025년 재해자 · 전 업종', title:'넘어짐', desc:'물·기름에 젖은 주방 바닥이나 계단에서 미끄러져 다치는 사고입니다.', lesson:'"젖은 바닥, 발견한 직원이 바로 신고했다면"', ico:'siren', fix:'안전신고로 예방'},
+      {img:'case-cut-hd.jpg', alt:'도마 위 조리용 칼 사진', num:'11,418', note:'2025년 재해자 · 전 업종', title:'절단·베임·찔림', desc:'칼, 육류 절단기, 슬라이서를 다루다 손을 베이거나 다치는 사고입니다.', lesson:'"기계가 이상할 땐, 바로 멈추고 알려야 합니다"', ico:'stop', fix:'작업중지권으로 예방'},
+      {img:'case-traffic.jpg', alt:'배달 오토바이와 승용차 교통사고 사진', num:'9,009', note:'2025년 재해자 · 전 업종', title:'교통사고', desc:'배달이나 외근으로 이동하던 중 일어나는 사고입니다.', lesson:'"출근할 때 이동 안전수칙만 확인했어도"', ico:'clock', fix:'출근하기(TBM)로 예방'}
+    ]
+  };
+  function renderCases(k){
+    const list = CASES_BY[k] || CASES_DEFAULT;
+    $('#caseGrid').innerHTML = list.map((c,i) => `
+      <article class="case">
+        <div class="case-ph"${c.img ? ` style="background-image:url(assets/${c.img})${c.pos ? `;background-position:${c.pos}` : ''}" role="img" aria-label="${c.alt}"` : ''}><span>사고사례 0${i+1}</span></div>
+        <div class="case-b">
+          <div class="case-stat">${c.num ? `<b>${c.num}<small>명</small></b>` : ''}<span${c.num ? '' : ' class="nostat"'}>${c.note}</span></div>
+          <h4>${c.title}</h4><p>${c.desc}</p><p class="lesson">${c.lesson}</p>
+          <div class="case-f"><img src="assets/case-ico-${c.ico}.svg" alt="" width="18" height="18">${c.fix}</div>
+        </div>
+      </article>`).join('');
+    $('#caseSrc').hidden = !list.some(c => c.num);
+    $('#caseSrc').textContent = CASES_SRC[k] || '출처: 고용노동부 2025년 재해조사 대상 사고사망 통계';
+  }
+
+  /* industry page render */
+  function renderInd(k){
+    const d = IND[k];
+    $('#iEb').textContent = `INDUSTRY ${d.n} · ${d.name}`;
+    $('#iTitle').innerHTML = d.hero.join('<br>');
+    $('#iDesc').textContent = d.desc;
+    $('#iIll').src = d.ill;
+    const big = d.big ? `<img class="big" src="${d.big}" alt="">` : `<div class="big-alt"><img src="${d.icon}" alt=""></div>`;
+    const rest = d.name === '소상공인·시장' ? '에서는 이렇게 씁니다' : '에서는 이렇게 씁니다';
+    $('#iFeatWrap').innerHTML = `
+      <div class="ifeat-head">${big}
+        <div class="t"><span class="tag">${d.tag}</span><h2><span>${d.hl}</span>${rest}</h2></div>
+      </div>` + d.feats.map((f,i) => `
+      <article class="irow">
+        <span class="bgnum" aria-hidden="true">0${i+1}</span>
+        <div class="irow-intro"><img class="fbox" src="assets/fbox-${FEAT_ICONS[i]}.svg" alt="" width="52" height="52"><h3>${f[0]}</h3><p>${f[1]}</p></div>
+        <div class="box-situ"><h4>이런 상황에서</h4>${f[2].map(s=>`<p class="situ"><img src="assets/warn.svg" alt="" width="16" height="26"><span>${s}</span></p>`).join('')}</div>
+        <div class="arrow-wrap"><img src="assets/arrow-btn-hd.png" alt=""></div>
+        <div class="box-how"><h4>안전비서로 이렇게</h4><div class="steps">${f[3].map((s,j)=>`<p class="step"><i>${j+1}</i><span>${s}</span></p>`).join('')}</div></div>
+      </article>`).join('');
+    renderCases(k);
+    $('#aEb').textContent = d.aEb;
+    $('#aTitle').innerHTML = `${d.aTitle}<br>무료로 상담받으세요`;
+    $$('[data-tab]').forEach(t => t.toggleAttribute('aria-current', false));
+    $$(`[data-tab="${k}"]`).forEach(t => t.setAttribute('aria-current','page'));
+    const sel = $('#ind'); if (!formDirty) sel.value = d.name;
+  }
+
+  /* routing */
+  let formDirty = false;
+  function route(){
+    const k = location.hash.slice(1);
+    const isInd = k in IND;
+    $('#viewHome').hidden = isInd; $('#navHome').hidden = isInd;
+    $('#viewInd').hidden = !isInd; $('#navInd').hidden = !isInd;
+    $('#applyHome').hidden = isInd; $('#applyInd').hidden = !isInd;
+    closeMenu();
+    if (isInd) { renderInd(k); document.title = `안전비서 · ${IND[k].name}`; }
+    else document.title = '안전비서 상세페이지';
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+  addEventListener('hashchange', route);
+
+  /* in-page scroll */
+  document.addEventListener('click', e => {
+    const g = e.target.closest('[data-go]');
+    if (g) { e.preventDefault(); closeMenu(); const t = document.getElementById(g.dataset.go); t && t.scrollIntoView({behavior:'smooth', block:'start'}); if (g.dataset.go==='apply') setTimeout(()=>$('#company').focus({preventScroll:true}), 600); }
+    const top = e.target.closest('[data-top]');
+    if (top && (location.hash === '' || location.hash === '#home')) { e.preventDefault(); window.scrollTo({top:0, behavior:'smooth'}); }
+  });
+
+  /* mobile menu */
+  const navHome = $('#navHome'), menuBtn = $('#menuBtn');
+  function closeMenu(){ navHome.classList.remove('menu-open'); menuBtn.setAttribute('aria-expanded','false'); menuBtn.setAttribute('aria-label','메뉴 열기'); }
+  menuBtn.addEventListener('click', () => { const o = navHome.classList.toggle('menu-open'); menuBtn.setAttribute('aria-expanded', o); menuBtn.setAttribute('aria-label', o ? '메뉴 닫기' : '메뉴 열기'); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  const mq = matchMedia('(max-width:860px)');
+  const syncCta = () => { $('#indCtaMobile').style.display = mq.matches ? '' : 'none'; };
+  mq.addEventListener('change', syncCta); syncCta();
+
+  /* toast */
+  let tt; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2200); }
+
+  /* phone mockup demo */
+  const pad = n => String(n).padStart(2,'0');
+  let working = true;
+  $('#phBtn').addEventListener('click', () => {
+    working = !working; const now = new Date(); const t = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    if (working){ $('#phIn').textContent = t; $('#phOut').textContent='--:--'; $('#phBadge').textContent='근무중'; $('#phBtn').textContent='퇴근하기'; }
+    else { $('#phOut').textContent = t; $('#phBadge').textContent='퇴근'; $('#phBtn').textContent='출근하기'; }
+  });
+  $('#phReport').addEventListener('click', () => { const t=$('#phToast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); });
+
+  /* e-learning demo */
+  let vt = null, left = 320;
+  $('#video').addEventListener('click', () => {
+    const ico = $('#playIco');
+    if (vt){ clearInterval(vt); vt=null; ico.innerHTML='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>'; return; }
+    ico.innerHTML='<svg viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>';
+    vt = setInterval(() => {
+      left = Math.max(0, left - 8);
+      $('#vTime').textContent = `${pad(Math.floor(left/60))}:${pad(left%60)}`;
+      const p = Math.round(80 + (320-left)/320*20);
+      $('#pct').textContent = p + '%'; $('#barFill').style.width = p + '%';
+      if (left === 0){ clearInterval(vt); vt=null; ico.innerHTML='<svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'; toast('수강 완료! 수료증이 자동 발급되었어요 (예시)'); }
+    }, 100);
+  });
+
+  /* sticky banner hides over apply/footer */
+  const sticky = $('#sticky');
+  const io = new IntersectionObserver(es => {
+    const vis = es.some(e => e.isIntersecting);
+    sticky.classList.toggle('hide', vis);
+  }, {threshold:0.15});
+  io.observe($('#apply'));
+
+  /* form */
+  const form = $('#form'), phone = $('#phone');
+  phone.addEventListener('input', () => {
+    const d = phone.value.replace(/\D/g,'').slice(0,11);
+    let v = d;
+    if (d.startsWith('02')) v = d.length>9 ? `${d.slice(0,2)}-${d.slice(2,6)}-${d.slice(6)}` : d.length>5 ? `${d.slice(0,2)}-${d.slice(2,5)}-${d.slice(5)}` : d.length>2 ? `${d.slice(0,2)}-${d.slice(2)}` : d;
+    else v = d.length>10 ? `${d.slice(0,3)}-${d.slice(3,7)}-${d.slice(7)}` : d.length>6 ? `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}` : d.length>3 ? `${d.slice(0,3)}-${d.slice(3)}` : d;
+    phone.value = v;
+  });
+  form.addEventListener('input', e => { formDirty = true; const f = e.target.closest('.fld'); f && f.classList.remove('err'); if (e.target.id==='agree') $('#agreeL').classList.remove('err'); });
+  form.addEventListener('change', e => { const f = e.target.closest('.fld'); f && f.classList.remove('err'); if (e.target.id==='agree') $('#agreeL').classList.remove('err'); });
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const v = { company: $('#company').value.trim(), name: $('#name').value.trim(), phone: phone.value.trim(), ind: $('#ind').value };
+    const bad = [];
+    if (!v.company) bad.push('f-company');
+    if (!v.name) bad.push('f-name');
+    if (!/^0\d{1,2}-\d{3,4}-\d{4}$/.test(v.phone)) bad.push('f-phone');
+    if (!v.ind) bad.push('f-ind');
+    $$('.fld', form).forEach(f => f.classList.toggle('err', bad.includes(f.id)));
+    const agreeOk = $('#agree').checked; $('#agreeL').classList.toggle('err', !agreeOk);
+    if (bad.length || !agreeOk){ const first = bad.length ? $('#'+bad[0]+' input, #'+bad[0]+' select') : $('#agree'); first.focus(); return; }
+    if ($('#website').value) return; // 스팸 방지용 숨은 칸
+    sendLead(v);
+  });
+  const WEBHOOK = 'https://discord.com/api/webhooks/1565248004582015017/C5r68TqIoCb6_BQZyp_0ZYKbBRbcmGhxS9FnH5zJrBhUjgfB15Hz0ueWByNMqSfRbvjl';
+  let sending = false;
+  async function sendLead(v){
+    if (sending) return; sending = true;
+    const btn = $('#submitBtn'); btn.disabled = true; btn.textContent = '보내는 중…'; $('#sendErr').hidden = true;
+    const k = location.hash.slice(1); const page = (k in IND) ? IND[k].name + ' 페이지' : '홈';
+    const clip = t => String(t).slice(0, 200);
+    const payload = {
+      username: '안전비서 상담 신청',
+      allowed_mentions: { parse: [] },
+      embeds: [{
+        title: '새 무료 도입 상담 신청',
+        color: 0xD7191F,
+        fields: [
+          { name: '회사명', value: clip(v.company), inline: true },
+          { name: '담당자명', value: clip(v.name), inline: true },
+          { name: '연락처', value: clip(v.phone), inline: true },
+          { name: '업종', value: clip(v.ind), inline: true },
+          { name: '신청한 페이지', value: page, inline: true },
+          { name: '개인정보 동의', value: '동의함', inline: true }
+        ],
+        timestamp: new Date().toISOString()
+      }]
+    };
+    const fd = new FormData(); fd.append('payload_json', JSON.stringify(payload));
+    try {
+      await fetch(WEBHOOK, { method: 'POST', body: fd, mode: 'no-cors' });
+      $('#summary').innerHTML = [['회사명',v.company],['담당자',v.name],['연락처',v.phone],['업종',v.ind]].map(([a])=>`<dt>${a}</dt><dd></dd>`).join('');
+      $$('#summary dd').forEach((dd,i)=> dd.textContent = [v.company,v.name,v.phone,v.ind][i]);
+      $('#formBody').hidden = true; $('#done').hidden = false;
+    } catch (err) {
+      $('#sendErr').hidden = false;
+    } finally {
+      sending = false; btn.disabled = false; btn.textContent = '상담 신청하기';
+    }
+  }
+  $('#again').addEventListener('click', () => {
+    form.reset(); formDirty = false; $('#done').hidden = true; $('#formBody').hidden = false;
+    const k = location.hash.slice(1); if (k in IND) $('#ind').value = IND[k].name;
+    $('#company').focus();
+  });
+
+  route();
+})();
+</script>
+
+</body></html>
