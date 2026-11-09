@@ -1025,7 +1025,7 @@ section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-in
     sendLead(v);
   });
   // 상담 신청을 받는 Cloudflare Worker 주소 (배포 후 실제 주소로 바꿔주세요)
-  const LEAD_ENDPOINT = 'https://safety-aide-lead.YOUR-SUBDOMAIN.workers.dev';
+  const LEAD_ENDPOINT = 'https://safety-aide-lead.geltencorp.workers.dev';
   let sending = false;
   async function sendLead(v){
     if (sending) return; sending = true;
