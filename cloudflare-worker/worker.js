@@ -67,25 +67,27 @@ export default {
       return reply({ ok: false, error: 'invalid_input' }, 400, cors);
     }
 
+    // 신청 시각 (한국 시간)
+    const time = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour12: false });
+
+    // 임베드(카드) 대신 일반 텍스트로 보냅니다.
+    // Discord 설정에서 '임베드 표시'가 꺼져 있어도 내용이 항상 보입니다.
+    const content = [
+      '📩 **안전비서 무료 도입 상담 신청**',
+      '',
+      `🏢 **회사명:** ${company}`,
+      `👤 **담당자:** ${name}`,
+      `📞 **연락처:** ${phone}`,
+      `🏭 **업종:** ${ind}`,
+      `📄 **신청 페이지:** ${page}`,
+      '✅ **개인정보 동의:** 동의함',
+      `🕒 **신청 시각:** ${time}`,
+    ].join('\n');
+
     const payload = {
       username: '안전비서 상담 신청',
       allowed_mentions: { parse: [] },
-      embeds: [
-        {
-          title: '새 무료 도입 상담 신청',
-          color: 0xd7191f,
-          fields: [
-            { name: '회사명', value: company, inline: true },
-            { name: '담당자명', value: name, inline: true },
-            { name: '연락처', value: phone, inline: true },
-            { name: '업종', value: ind, inline: true },
-            { name: '신청한 페이지', value: page, inline: true },
-            { name: '개인정보 동의', value: '동의함', inline: true },
-          ],
-          footer: { text: origin || '출처 정보 없음' },
-          timestamp: new Date().toISOString(),
-        },
-      ],
+      content,
     };
 
     let res;
