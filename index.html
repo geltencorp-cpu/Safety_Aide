@@ -401,8 +401,15 @@ section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-in
 .step:last-child i{background:#000}
 .arrow-wrap{display:flex;align-items:center;justify-content:center}
 .arrow-wrap img{width:28px;height:28px}
-@media (max-width:1024px){.irow{grid-template-columns:1fr 1fr}.irow-intro{grid-column:1/-1}.arrow-wrap{display:none}}
-@media (max-width:640px){.irow{grid-template-columns:1fr;padding:24px 20px}.ifeat .wrap{padding-top:56px;padding-bottom:56px}.box-situ,.box-how{padding:20px}.irow .bgnum{font-size:72px}.big-alt{margin-left:0;width:160px;height:160px}.big-alt img{width:88px;height:88px}}
+.irow-intro{grid-column:1;grid-row:1/span 2}
+.box-situ{grid-column:2;grid-row:1}
+.arrow-wrap{grid-column:3;grid-row:1}
+.box-how{grid-column:4;grid-row:1}
+.iphoto{width:100%;height:auto;aspect-ratio:340/200;object-fit:cover;border-radius:16px;display:block;background:var(--soft-2);min-width:0}
+.iphoto-a{grid-column:2;grid-row:2}
+.iphoto-b{grid-column:4;grid-row:2}
+@media (max-width:1024px){.irow{grid-template-columns:1fr 1fr}.irow-intro{grid-column:1/-1;grid-row:1}.arrow-wrap{display:none}.box-situ{grid-column:1;grid-row:2}.box-how{grid-column:2;grid-row:2}.iphoto-a{grid-column:1;grid-row:3}.iphoto-b{grid-column:2;grid-row:3}}
+@media (max-width:640px){.irow{grid-template-columns:1fr;padding:24px 20px}.irow-intro,.box-situ,.box-how,.iphoto-a,.iphoto-b{grid-column:1}.irow-intro{grid-row:1}.box-situ{grid-row:2}.iphoto-a{grid-row:3}.box-how{grid-row:4}.iphoto-b{grid-row:5}.ifeat .wrap{padding-top:56px;padding-bottom:56px}.box-situ,.box-how{padding:20px}.irow .bgnum{font-size:72px}.big-alt{margin-left:0;width:160px;height:160px}.big-alt img{width:88px;height:88px}}
 
 /* common section */
 .common{background:var(--soft)}
@@ -836,6 +843,8 @@ section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-in
         ['컨디션관리','아르바이트·단시간 근로자가 자주 바뀌어도, 출근할 때마다 컨디션을 확인하고 이력을 이어갑니다.',['잦은 인력 교체로 직원 상태 파악이 어려움','혼자 근무하는 시간대의 건강 이상','바쁜 시간대 연속 근무 피로'],['출근 시 30초 컨디션 체크','주의 직원은 사장님 폰에 바로 표시','직원이 바뀌어도 관리 이력 유지']]]}
   };
   const FEAT_ICONS = ['siren','stop','heart'];
+  // 기능 카드 사진이 준비된 업종 (assets/feat-업종-번호a/b.jpg)
+  const PHOTO_SET = new Set(['mfg','shop']);
 
   /* industry cards on home */
   $('#indGrid').innerHTML = Object.entries(IND).map(([k,d]) => `
@@ -918,6 +927,7 @@ section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-in
         <div class="box-situ"><h4>이런 상황에서</h4>${f[2].map(s=>`<p class="situ"><img src="assets/warn.svg" alt="" width="16" height="26"><span>${s}</span></p>`).join('')}</div>
         <div class="arrow-wrap"><img src="assets/arrow-btn-hd.png" alt=""></div>
         <div class="box-how"><h4>안전비서로 이렇게</h4><div class="steps">${f[3].map((s,j)=>`<p class="step"><i>${j+1}</i><span>${s}</span></p>`).join('')}</div></div>
+        ${PHOTO_SET.has(k) ? `<img class="iphoto iphoto-a" src="assets/feat-${k}-${i+1}a.jpg" alt="${d.name} ${f[0]}: 이런 상황에서" loading="lazy" width="1020" height="600"><img class="iphoto iphoto-b" src="assets/feat-${k}-${i+1}b.jpg" alt="${d.name} ${f[0]}: 안전비서로 해결하는 모습" loading="lazy" width="1020" height="600">` : ''}
       </article>`).join('');
     renderCases(k);
     $('#aEb').textContent = d.aEb;
