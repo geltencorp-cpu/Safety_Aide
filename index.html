@@ -407,6 +407,22 @@ section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-in
 .box-how{grid-column:4;grid-row:1}
 .iphoto{width:100%;height:auto;aspect-ratio:340/200;object-fit:cover;border-radius:16px;display:block;background:var(--soft-2);min-width:0}
 .iphoto-a{grid-column:2;grid-row:2}
+.fx{position:relative;overflow:hidden;border-radius:16px;min-width:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fx .iphoto{border-radius:0}
+.fx::after{content:"";position:absolute;inset:0;opacity:0;pointer-events:none}
+.fx-flash::after{background:#fff}
+.fx-flash.play::after{animation:fxFlash .6s ease-out}
+.fx-flash.play .iphoto{animation:fxShutter .6s ease-out}
+@keyframes fxFlash{0%{opacity:0}7%{opacity:.95}100%{opacity:0}}
+@keyframes fxShutter{0%{transform:scale(1)}7%{transform:scale(1.035)}100%{transform:scale(1)}}
+.fx-siren::after{background:radial-gradient(circle at 50% 45%,rgba(255,60,60,.55),rgba(215,25,31,.9))}
+.fx-siren.play::after{animation:fxSiren 1.8s ease-in-out}
+@keyframes fxSiren{0%,33%,66%,100%{opacity:0}16%,50%,83%{opacity:.6}}
+.fx-hearts{position:absolute;inset:0;pointer-events:none}
+.fx-hearts i{position:absolute;bottom:-24px;display:block;opacity:0;animation-name:fxRise;animation-timing-function:ease-out;animation-fill-mode:forwards;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
+.fx-hearts i svg{width:100%;height:100%;display:block}
+@keyframes fxRise{0%{transform:translate(0,0) scale(.5);opacity:0}15%{opacity:1}70%{opacity:.9}100%{transform:translate(var(--dx),calc(var(--rise) * -1)) scale(1.1);opacity:0}}
+@media (prefers-reduced-motion:reduce){.fx::after,.fx .iphoto{animation:none!important}}
 .iphoto-b{grid-column:4;grid-row:2}
 @media (max-width:1024px){.irow{grid-template-columns:1fr 1fr}.irow-intro{grid-column:1/-1;grid-row:1}.arrow-wrap{display:none}.box-situ{grid-column:1;grid-row:2}.box-how{grid-column:2;grid-row:2}.iphoto-a{grid-column:1;grid-row:3}.iphoto-b{grid-column:2;grid-row:3}}
 @media (max-width:640px){.irow{grid-template-columns:1fr;padding:24px 20px}.irow-intro,.box-situ,.box-how,.iphoto-a,.iphoto-b{grid-column:1}.irow-intro{grid-row:1}.box-situ{grid-row:2}.iphoto-a{grid-row:3}.box-how{grid-row:4}.iphoto-b{grid-row:5}.ifeat .wrap{padding-top:56px;padding-bottom:56px}.box-situ,.box-how{padding:20px}.irow .bgnum{font-size:72px}.big-alt{margin-left:0;width:160px;height:160px}.big-alt img{width:88px;height:88px}}
@@ -845,6 +861,8 @@ section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-in
   const FEAT_ICONS = ['siren','stop','heart'];
   // 기능 카드 사진이 준비된 업종 (assets/feat-업종-번호a/b.jpg)
   const PHOTO_SET = new Set(['mfg','svc','con','shop']);
+  // 기능별 사진 효과: 안전신고=카메라 플래시, 작업중지권=사이렌, 컨디션관리=하트
+  const FX = ['flash','siren','heart'];
 
   /* industry cards on home */
   $('#indGrid').innerHTML = Object.entries(IND).map(([k,d]) => `
@@ -908,6 +926,45 @@ section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-in
     $('#caseSrc').textContent = CASES_SRC[k] || '출처: 고용노동부 2025년 재해조사 대상 사고사망 통계';
   }
 
+  /* 사진 효과: 마우스를 올리면(PC) / 화면에 보이거나 누르면(모바일) 재생 */
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const HEART_SVG = '<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.3 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.8 4.3 7.3C19.5 16.4 12 21 12 21z" fill="currentColor"/></svg>';
+  function playFx(el){
+    if (reduceMotion || el.dataset.playing) return;
+    el.dataset.playing = '1';
+    const type = el.dataset.fx;
+    const done = () => { el.classList.remove('play'); delete el.dataset.playing; };
+    if (type === 'heart') {
+      const box = el.querySelector('.fx-hearts');
+      for (let n = 0; n < 16; n++) {
+        const h = document.createElement('i');
+        const size = 10 + Math.random() * 14;
+        h.style.cssText = `left:${4 + Math.random() * 92}%;width:${size}px;height:${size}px;--dx:${(Math.random() * 40 - 20).toFixed(0)}px;--rise:${(130 + Math.random() * 90).toFixed(0)}px;animation-duration:${(1.6 + Math.random() * 1.2).toFixed(2)}s;animation-delay:${(Math.random() * 0.7).toFixed(2)}s;color:${Math.random() < .5 ? '#ff6b6b' : '#ffd1d1'}`;
+        h.innerHTML = HEART_SVG;
+        h.addEventListener('animationend', () => h.remove());
+        box.appendChild(h);
+      }
+      setTimeout(done, 2600);
+      return;
+    }
+    el.classList.remove('play'); void el.offsetWidth; el.classList.add('play');
+    setTimeout(done, type === 'siren' ? 1900 : 650);
+  }
+  let fxObserver = null;
+  function bindFx(){
+    if (fxObserver) fxObserver.disconnect();
+    const els = $$('#iFeatWrap .fx');
+    els.forEach(el => {
+      if (canHover) el.addEventListener('mouseenter', () => playFx(el));
+      el.addEventListener('click', () => playFx(el));
+    });
+    if (!canHover && 'IntersectionObserver' in window) {
+      fxObserver = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) playFx(e.target); }), { threshold: 0.6 });
+      els.forEach(el => fxObserver.observe(el));
+    }
+  }
+
   /* industry page render */
   function renderInd(k){
     const d = IND[k];
@@ -927,8 +984,9 @@ section[id],[data-anchor]{scroll-margin-top:calc(var(--nav-h) + env(safe-area-in
         <div class="box-situ"><h4>이런 상황에서</h4>${f[2].map(s=>`<p class="situ"><img src="assets/warn.svg" alt="" width="16" height="26"><span>${s}</span></p>`).join('')}</div>
         <div class="arrow-wrap"><img src="assets/arrow-btn-hd.png" alt=""></div>
         <div class="box-how"><h4>안전비서로 이렇게</h4><div class="steps">${f[3].map((s,j)=>`<p class="step"><i>${j+1}</i><span>${s}</span></p>`).join('')}</div></div>
-        ${PHOTO_SET.has(k) ? `<img class="iphoto iphoto-a" src="assets/feat-${k}-${i+1}a.jpg" alt="${d.name} ${f[0]}: 이런 상황에서" loading="lazy" width="1020" height="600"><img class="iphoto iphoto-b" src="assets/feat-${k}-${i+1}b.jpg" alt="${d.name} ${f[0]}: 안전비서로 해결하는 모습" loading="lazy" width="1020" height="600">` : ''}
+        ${PHOTO_SET.has(k) ? `<img class="iphoto iphoto-a" src="assets/feat-${k}-${i+1}a.jpg" alt="${d.name} ${f[0]}: 이런 상황에서" loading="lazy" width="1020" height="600"><div class="iphoto-b fx fx-${FX[i]}" data-fx="${FX[i]}"><img class="iphoto" src="assets/feat-${k}-${i+1}b.jpg" alt="${d.name} ${f[0]}: 안전비서로 해결하는 모습" loading="lazy" width="1020" height="600">${FX[i]==='heart' ? '<span class="fx-hearts" aria-hidden="true"></span>' : ''}</div>` : ''}
       </article>`).join('');
+    bindFx();
     renderCases(k);
     $('#aEb').textContent = d.aEb;
     $('#aTitle').innerHTML = `${d.aTitle}<br>무료로 상담받으세요`;
